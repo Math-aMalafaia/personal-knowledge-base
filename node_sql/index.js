@@ -103,6 +103,24 @@ app.post('/livros/:id/atualizar', (req, res) => {
     );
 });
 
+app.post('/livros/:id/excluir', (req, res) => {
+    const id = req.params.id;
+
+    const sql = `DELETE FROM livros WHERE id = ?`;
+    conn.query(
+        sql, 
+        [id],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+
+            res.redirect('/livros');
+        }
+    );
+});
+
 const conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',

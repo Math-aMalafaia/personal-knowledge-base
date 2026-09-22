@@ -1,5 +1,7 @@
 <h1>Meu Catálogo de Livros</h1>
 
+<a href="/">Cadastrar livro</a>
+
 {{#each livros}}
 
 <div>
@@ -11,6 +13,9 @@
     <p>Quantidade: {{this.quantidade}}</p>
 
     <a href="/livros/{{this.id}}/editar">Editar</a>
+    <form action="/livros/{{this.id}}/excluir" method="POST" style="display: inline;">
+        <button type="submit">Excluir</button>
+    </form>
 </div>
 
 <hr>
