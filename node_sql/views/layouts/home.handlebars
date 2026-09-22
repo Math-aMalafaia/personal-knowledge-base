@@ -1,3 +1,39 @@
 <h1>Meu CRUD de Livros</h1>
 
-<p>Servidor funcionando com Express + Handlebars!</p>
+<form action="/livros/inserir" method="POST">
+    <div>
+        <label for="nome">Nome do livro:</label>
+        <input type="text" name="nome" id="nome" required>
+    </div>
+
+    <div>
+        <label for="autor">Autor:</label>
+        <input type="text" name="autor" id="autor" required>
+    </div>
+
+    <div>
+        <label for="genero">Gênero:</label>
+        <input type="text" name="genero" id="genero" required>
+    </div>
+
+    <div>
+        <label for="status">Status:</label>
+        <select name="status" id="status" required>
+            <option value="Não lido">Não lido</option>
+            <option value="Lendo">Lendo</option>
+            <option value="Lido">Lido</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" name="quantidade" id="quantidade" min="1" value="1" required>
+    </div>
+
+    <button type="submit">Cadastrar Livro</button>
+
+</form>
+
+<br>
+
+<a href="/livros">Ver meus livros</a>

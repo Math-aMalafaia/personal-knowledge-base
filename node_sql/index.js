@@ -38,6 +38,28 @@ app.get('/livros', (req, res) => {
     });
 });
 
+app.post('/livros/inserir', (req, res) => {
+    const nome = req.body.nome;
+    const autor = req.body.autor;
+    const genero = req.body.genero;
+    const status = req.body.status;
+    const quantidade = req.body.quantidade;
+
+    const sql = `INSERT INTO livros (nome, autor, genero, status, quantidade) VALUES ('${nome}', '${autor}', '${genero}', '${status}', '${quantidade}')`;
+
+    conn.query(
+        sql,
+        [nome, autor, genero, status, quantidade],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            res.redirect('/livros');
+        }
+    );
+});
+
 const conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
