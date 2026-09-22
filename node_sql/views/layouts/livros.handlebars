@@ -1,0 +1,16 @@
+<h1>Meu Catálogo de Livros</h1>
+
+{{#each livros}}
+
+<div>
+    <h2>{{this.nome}}</h2>
+
+    <p>Autor: {{this.autor}}</p>
+    <p>Gênero:  {{this.genero}}</p>
+    <p>Status: {{this.status}}</p>
+    <p>Quantidade: {{this.quantidade}}</p>
+</div>
+
+<hr>
+
+{{/each}}

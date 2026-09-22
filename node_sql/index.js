@@ -21,6 +21,23 @@ app.get('/', (req, res) => {
     res.render('layouts/home');
 });
 
+app.get('/livros', (req, res) => {
+
+    const sql = 'SELECT * FROM livros';
+
+    conn.query(sql, (err, data) => {
+
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        console.log(data);
+
+        res.render('layouts/livros', { livros: data });
+    });
+});
+
 const conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
