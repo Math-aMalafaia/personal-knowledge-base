@@ -60,6 +60,49 @@ app.post('/livros/inserir', (req, res) => {
     );
 });
 
+app.get('/livros/:id/editar', (req, res) => {
+
+    const id = req.params.id;
+
+    const sql = 'SELECT * FROM livros WHERE id = ?';
+
+    conn.query(sql, [id], (err, data) => {
+
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        res.render('layouts/editar', { livro: data[0] });
+    });
+});
+
+app.post('/livros/:id/atualizar', (req, res) => {
+    const id = req.params.id;
+
+    const nome = req.body.nome;
+    const autor = req.body.autor;
+    const genero = req.body.genero;
+    const status = req.body.status;
+    const quantidade = req.body.quantidade;
+
+    const sql = `UPDATE livros 
+    SET nome = ?, autor = ?, genero = ?, status = ?, quantidade = ? WHERE id = ?`;
+
+    conn.query(
+        sql, 
+        [nome, autor, genero, status, quantidade, id],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+
+            res.redirect('/livros');
+        }
+    );
+});
+
 const conn = mysql.createConnection({
     host: 'localhost',
     user: 'root',
