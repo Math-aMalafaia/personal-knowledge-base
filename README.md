@@ -42,9 +42,9 @@ As informações cadastradas podem incluir dados como:
 
 * 📖 Título
 * ✍️ Autor
-* 📅 Ano de publicação
-* 🏷️ Categoria
-* 📄 Descrição
+* 🏷️ Gênero
+* 📄 Quantidade
+* 📄 Status
 
 ---
 
@@ -130,11 +130,11 @@ Exemplo conceitual:
 | Campo       | Descrição              |
 | ----------- | ---------------------- |
 | `id`        | Identificador do livro |
-| `titulo`    | Título do livro        |
+| `nome`      | Título do livro        |
 | `autor`     | Autor do livro         |
-| `ano`       | Ano de publicação      |
-| `categoria` | Categoria do livro     |
-| `descricao` | Descrição do livro     |
+| `Genoro`    | Gênero do livro        |
+| `Status`    | Se foi lido, seta sendo lido ou não foi lido     |
+| `Qunatidade`| Quantos livros tem     |
 
 ---
 
@@ -270,7 +270,7 @@ O projeto ainda pode receber diversas melhorias.
 * [x] ➕ Cadastrar livros
 * [x] 👀 Listar livros
 * [x] ✏️ Editar livros
-* [ ] 🗑️ Excluir livros
+* [x] 🗑️ Excluir livros
 * [ ] 🔎 Pesquisar livros
 * [ ] 🏷️ Filtrar por categoria
 * [ ] 📄 Adicionar paginação
