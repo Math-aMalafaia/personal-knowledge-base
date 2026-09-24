@@ -1,11 +1,13 @@
 import './App.css'
+import LivroLista from './components/LivroLista'
 
 function App() {
 
   return (
-    <div className="App">
+    <div>
       <h1>Meu CRUD de livros</h1>
-      <p>Frontend React funcionando</p>
+ 
+      <LivroLista />
     </div>
   )
 }

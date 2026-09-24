@@ -1,125 +1,18 @@
 const express = require('express');
-const exphbs = require('express-handlebars');
 const mysql = require('mysql2');    
-const path = require('path');
+const cors = require('cors');
 
 const app = express();
 
-app.engine('handlebars', exphbs.engine());
+app.use(cors());
 
-app.set('view engine', 'handlebars');
-
-app.set('views', path.join(__dirname, 'views'));
+app.use(express.json());
 
 app.use(express.urlencoded({
     extended: true
 }));
 
-app.use(express.json());
-
-app.get('/', (req, res) => {
-    res.render('layouts/home');
-});
-
-app.get('/livros', (req, res) => {
-
-    const sql = 'SELECT * FROM livros';
-
-    conn.query(sql, (err, data) => {
-
-        if (err) {
-            console.log(err);
-            return;
-        }
-
-        console.log(data);
-
-        res.render('layouts/livros', { livros: data });
-    });
-});
-
-app.post('/livros/inserir', (req, res) => {
-    const nome = req.body.nome;
-    const autor = req.body.autor;
-    const genero = req.body.genero;
-    const status = req.body.status;
-    const quantidade = req.body.quantidade;
-
-    const sql = `INSERT INTO livros (nome, autor, genero, status, quantidade) VALUES ('${nome}', '${autor}', '${genero}', '${status}', '${quantidade}')`;
-
-    conn.query(
-        sql,
-        [nome, autor, genero, status, quantidade],
-        (err) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            res.redirect('/livros');
-        }
-    );
-});
-
-app.get('/livros/:id/editar', (req, res) => {
-
-    const id = req.params.id;
-
-    const sql = 'SELECT * FROM livros WHERE id = ?';
-
-    conn.query(sql, [id], (err, data) => {
-
-        if (err) {
-            console.log(err);
-            return;
-        }
-
-        res.render('layouts/editar', { livro: data[0] });
-    });
-});
-
-app.post('/livros/:id/atualizar', (req, res) => {
-    const id = req.params.id;
-
-    const nome = req.body.nome;
-    const autor = req.body.autor;
-    const genero = req.body.genero;
-    const status = req.body.status;
-    const quantidade = req.body.quantidade;
-
-    const sql = `UPDATE livros 
-    SET nome = ?, autor = ?, genero = ?, status = ?, quantidade = ? WHERE id = ?`;
-
-    conn.query(
-        sql, 
-        [nome, autor, genero, status, quantidade, id],
-        (err) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-
-            res.redirect('/livros');
-        }
-    );
-});
-
-app.post('/livros/:id/excluir', (req, res) => {
-    const id = req.params.id;
-
-    const sql = `DELETE FROM livros WHERE id = ?`;
-    conn.query(
-        sql, 
-        [id],
-        (err) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-
-            res.redirect('/livros');
-        }
-    );
-});
+/* Conexão com Mysql */
 
 const conn = mysql.createConnection({
     host: 'localhost',
@@ -135,8 +28,117 @@ conn.connect(function(err) {
     }
 
     console.log('Conectado ao MySQL!')
+
+    app.listen(3000, () => {
+    console.log('Servidor rodando em http://localhost:3000');
+    });
 })
 
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+/* Rota pricipal */
+
+app.get('/', (req, res) => {
+    res.json({ message: 'Bem-vindo à API de livros!' });
 });
+
+/* Rota para exibir a lista de livros */
+
+app.get('/api/livros', (req, res) => {
+
+    const sql = 'SELECT * FROM livros';
+
+    conn.query(sql, (err, data) => {
+
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Erro ao buscar livros' });
+        }
+
+        res.status(200).json(data);
+    });
+});
+
+/* Cadastrar */
+
+app.post('/api/livros/inserir', (req, res) => {
+    const {nome, autor, genero, status, quantidade} = req.body;
+
+    if (!nome || !autor || !genero || !status || !quantidade) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    const sql = `INSERT INTO livros (nome, autor, genero, status, quantidade) VALUES (?, ?, ?, ?, ?)`;
+
+    conn.query(
+        sql,
+        [nome, autor, genero, status, quantidade],
+        (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao inserir livro' });
+            }
+            return res.status(201).json({ message: 'Livro inserido com sucesso',  });
+        });
+});
+
+/* Atualizar */
+
+app.put('/api/livros/:id', (req, res) => {
+
+    const id = req.params.id;
+
+    const {nome, autor, genero, status, quantidade} = req.body;
+
+    if (!nome || !autor || !genero || !status || !quantidade) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    const sql = `UPDATE livros SET nome = ?, autor = ?, genero = ?, status = ?, quantidade = ? WHERE id = ?`;
+
+    conn.query(
+        sql,
+        [nome, autor, genero, status, quantidade, id],
+        (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Erro ao atualizar livro' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Livro não encontrado' });
+            }
+            return res.status(200).json({ 
+                message: 'Livro atualizado com sucesso',
+                livro   : {
+                    id,
+                    nome,
+                    autor,
+                    genero,
+                    status,
+                    quantidade
+                }
+            });
+        }
+    );
+});
+
+/* Deletar */
+
+app.delete('/api/livros/:id', (req, res) => {
+    const id = req.params.id
+
+    const sql = 'DELETE FROM livros WHERE id = ?';
+
+    conn.query(sql, [id], (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Erro ao deletar livro' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Livro não encontrado' });
+        }
+            return res.status(200).json({ message: 'Livro deletado com sucesso' });
+        }
+    );
+});
+
