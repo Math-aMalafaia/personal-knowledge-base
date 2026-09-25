@@ -1,17 +1,23 @@
 import {useEffect, useState } from 'react';
+import { buscarLivros } from '../services/api';
+import LivroInserir from './LivroInserir';
 
 function LivroLista() {
   const [livros, setLivros] = useState([]);
+  const [mostrarCadastro, setMostrarCadastro] = useState(false);
+
+  const carrgarLivros = () => {
+    buscarLivros()
+    .then(data => {
+      setLivros(data);
+    })
+    .catch(error => {
+      console.error('Erro ao buscar livros:', error);
+    });
+  }
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/livros')
-      .then(response => response.json())
-    .then(data => {
-        setLivros(data);
-      })
-      .catch(error => {
-        console.error('Erro ao buscar livros:', error);
-      });
+    carrgarLivros();
   }, []);
 
   return (
@@ -24,14 +30,18 @@ function LivroLista() {
           <p>Gênero: {livro.genero}</p>
           <p>Status: {livro.status}</p>
           <p>Quantidade: {livro.quantidade}</p>
+
+          <hr/>
         </div>
       ))}
 
       <div>
+        <button onClick={() =>setMostrarCadastro(true)}>cadastrar Livro</button>
         <button>Editar</button>
         <button>Excluir</button>
-        <button>cadastrar</button>
       </div>
+
+      {mostrarCadastro && <LivroInserir fechar={() => setMostrarCadastro(false)} atualizarLista={carrgarLivros} />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { cadastrarLivro } from '../services/api';
 
-function LivroInserir() {
+function LivroInserir({ fechar, atualizarLista }) {
     const [nome, setNome] = useState('');
     const [autor, setAutor] = useState('');
     const [genero, setGenero] = useState('');
@@ -11,30 +12,20 @@ function LivroInserir() {
         event.preventDefault();
 
         const Livro = {
-            nome,
-            autor,
-            genero,
-            status,
-            quantidade
+            nome: nome,
+            autor: autor,
+            genero: genero,
+            status: status,
+            quantidade: Number(quantidade)
         };
 
-        fetch('http://localhost:3000/api/livros/inserir', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(Livro)
-        })
-        .then(response => response.json())
+        cadastrarLivro(Livro)
         .then(data => {
             console.log('Livro inserido:', data);
             alert('Livro inserido com sucesso!');
 
-            setNome('');
-            setAutor('');
-            setGenero('');
-            setStatus('');
-            setQuantidade('');
+            atualizarLista();
+            fechar();
         })
         .catch(error => {
             console.error('Erro ao inserir livro:', error);
@@ -44,7 +35,12 @@ function LivroInserir() {
 
     return (
         <div>
-            <h2>Cadastrar livro</h2>
+            <div>
+                <h2>Cadastrar livro</h2>
+                <button onClick={fechar}>
+                    X
+                </button>
+            </div>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>Nome:</label>

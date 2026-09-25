@@ -1,8 +1,5 @@
 import './App.css'
 import LivroLista from './components/LivroLista'
-import LivroInserir from './components/LivroInserir'
-import LivroEditar from './components/LivroEditar'
-import LivroExcluir from './components/LivroExcluir'
 
 function App() {
 
