@@ -1,5 +1,6 @@
 import './App.css'
 import LivroLista from './components/LivroLista'
+import LivroInserir from './components/LivroInserir'
 
 function App() {
 
@@ -8,6 +9,7 @@ function App() {
       <h1>Meu CRUD de livros</h1>
  
       <LivroLista />
+      <LivroInserir />
     </div>
   )
 }
