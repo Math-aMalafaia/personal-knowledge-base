@@ -19,7 +19,7 @@ function LivroEditar() {
         };
 
         fetch('http://localhost:3000/api/livros/inserir', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
