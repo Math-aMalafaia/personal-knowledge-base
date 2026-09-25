@@ -26,6 +26,12 @@ function LivroLista() {
           <p>Quantidade: {livro.quantidade}</p>
         </div>
       ))}
+
+      <div>
+        <button>Editar</button>
+        <button>Excluir</button>
+        <button>cadastrar</button>
+      </div>
     </div>
   );
 }

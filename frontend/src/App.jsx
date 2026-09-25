@@ -11,10 +11,6 @@ function App() {
       <h1>Meu CRUD de livros</h1>
  
       <LivroLista />
-      <LivroInserir />
-      <LivroEditar />
-
-      <LivroExcluir />
     </div>
   )
 }
