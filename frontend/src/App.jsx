@@ -1,6 +1,7 @@
 import './App.css'
 import LivroLista from './components/LivroLista'
 import LivroInserir from './components/LivroInserir'
+import LivroEditar from './components/LivroEditar'
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
  
       <LivroLista />
       <LivroInserir />
+      <LivroEditar />
     </div>
   )
 }
