@@ -4,9 +4,7 @@ import LivroLista from './components/LivroLista'
 function App() {
 
   return (
-    <div>
-      <h1>Meu CRUD de livros</h1>
- 
+    <div className='app'>
       <LivroLista />
     </div>
   )

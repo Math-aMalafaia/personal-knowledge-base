@@ -1,0 +1,122 @@
+:root {
+  /* ================================
+     CORES PRINCIPAIS
+     ================================ */
+
+  --cor-fundo: #17120f;
+  --cor-fundo-secundario: #211a15;
+
+  --cor-madeira: #5a3825;
+  --cor-madeira-escura: #3d2519;
+  --cor-madeira-clara: #70472f;
+
+  --cor-texto: #f5ead8;
+  --cor-texto-secundario: #b9a995;
+
+  --cor-dourado: #c89b55;
+  --cor-dourado-claro: #dfbd7d;
+
+  --cor-borda: #6b4932;
+
+  --cor-sucesso: #668f68;
+  --cor-perigo: #a65353;
+
+  /* ================================
+     SOMBRAS
+     ================================ */
+
+  --sombra-leve: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --sombra-media: 0 5px 15px rgba(0, 0, 0, 0.3);
+  --sombra-forte: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+  /* ================================
+     ESPAÇAMENTOS
+     ================================ */
+
+  --espaco-1: 8px;
+  --espaco-2: 16px;
+  --espaco-3: 24px;
+  --espaco-4: 32px;
+  --espaco-5: 48px;
+
+  /* ================================
+     BORDAS
+     ================================ */
+
+  --borda-fina: 1px solid var(--cor-borda);
+
+  --raio-pequeno: 4px;
+  --raio-medio: 8px;
+  --raio-grande: 12px;
+
+  /* ================================
+     TRANSIÇÕES
+     ================================ */
+
+  --transicao-rapida: 0.15s ease;
+  --transicao: 0.25s ease;
+}
+
+
+/* ================================
+   RESET
+   ================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* ================================
+   DOCUMENTO
+   ================================ */
+
+html {
+  min-height: 100%;
+}
+
+
+body {
+  min-height: 100vh;
+
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  line-height: 1.5;
+}
+
+
+/* ================================
+   ELEMENTOS GERAIS
+   ================================ */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+
+button {
+  cursor: pointer;
+}
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+
+/* ================================
+   ROOT DO REACT
+   ================================ */
+
+#root {
+  min-height: 100vh;
+}
