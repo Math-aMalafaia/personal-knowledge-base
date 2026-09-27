@@ -177,7 +177,7 @@
 
 /*
    ESTANTE
-   */
+*/
 
 .estante {
   width: 100%;
@@ -201,32 +201,136 @@
   position: relative;
 
   width: 100%;
-  min-height: 230px;
-  height: auto;
+  min-height: 280px;
 
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
 
-  gap: 10px;
+  gap: 12px;
 
-  padding: 20px 18px 0;
+  padding: 30px 24px 0;
 
   margin-bottom: 35px;
 
-  border-bottom: 12px solid var(--cor-madeira);
+  border-bottom: 14px solid var(--cor-madeira);
 
   background-color: var(--cor-madeira-escura);
 }
 
 
-.prateleira:last-child {
-  margin-bottom: 0;
+/*
+   LIVRO
+*/
+
+.livro {
+  position: relative;
+
+  flex: 0 0 58px;
+
+  width: 58px;
+  height: 210px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 8px;
+
+  border: none;
+  border-left: 5px solid rgba(0, 0, 0, 0.18);
+
+  border-radius: 2px 5px 4px 2px;
+
+  background-color: var(--livro-cor);
+
+  color: var(--cor-texto);
+
+  cursor: pointer;
+
+  box-shadow:
+    3px 4px 6px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform var(--transicao),
+    box-shadow var(--transicao),
+    filter var(--transicao);
 }
 
 
 /*
-   ESTADO VAZIO
+   Efeito ao passar o mouse
+*/
+
+.livro:hover {
+  transform: translateY(-14px);
+
+  filter: brightness(1.12);
+
+  box-shadow:
+    5px 12px 15px rgba(0, 0, 0, 0.45);
+
+  z-index: 2;
+}
+
+
+/*
+   Faixa do gênero
+*/
+
+.livro-faixa {
+  position: absolute;
+
+  bottom: 10px;
+  left: 5px;
+  right: 5px;
+
+  padding: 3px 2px;
+
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: 8px;
+  font-weight: 600;
+
+  text-align: center;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+
+/*
+   Título do livro
+*/
+
+.livro-titulo {
+  display: block;
+
+  max-height: 175px;
+
+  overflow: hidden;
+
+  writing-mode: vertical-rl;
+
+  text-orientation: mixed;
+
+  color: var(--cor-texto);
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  text-align: center;
+}
+
+
+/*
+   Estado vazio
 */
 
 .estante-vazia {

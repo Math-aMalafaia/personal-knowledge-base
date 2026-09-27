@@ -3,12 +3,14 @@ import { buscarLivros } from '../services/api';
 import LivroInserir from './LivroInserir';
 import LivroEditar from './LivroEditar';
 import LivroExcluir from './LivroExcluir';
+import LivroDetalhes from './LivroDetalhes';
 
 function LivroLista() {
   const [livros, setLivros] = useState([]);
   const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [mostrarEdicao, setMostrarEdicao] = useState(false);
   const [mostrarExclusao, setMostrarExclusao] = useState(false);
+  const [livroSelecionado, setLivroSelecionado] = useState(null);
 
   const carrgarLivros = () => {
     buscarLivros()
@@ -23,6 +25,39 @@ function LivroLista() {
   useEffect(() => {
     carrgarLivros();
   }, []);
+
+  const coresLivros = [
+    '#70472f',
+    '#385a4a',
+    '#4b536f',
+    '#6b4358',
+    '#80613d',
+    '#594b70',
+    '#7a4938',
+    '#3f5f69'
+  ];
+
+  const obterCorLivro = (id) => {
+    return coresLivros[id % coresLivros.length];
+  };
+
+  const abrirDetalhes = (livro) => {
+    setLivroSelecionado(livro);
+  };
+
+  const fecharDetalhes = () => {
+    setLivroSelecionado(null);
+  };
+
+  const abrirEdicao = () => {
+    setLivroSelecionado(null);
+    setMostrarEdicao(true);
+  };
+
+  const abrirExclusao = () => {
+    setLivroSelecionado(null);
+    setMostrarExclusao(true);
+  };
 
   return (
     <div className="biblioteca">
@@ -55,18 +90,9 @@ function LivroLista() {
           ) : (
             <div className='prateleira'>
               {livros.map((livro) => (
-                <article classname='livro' key={livro.id}>
-
-                  <div classeName='livro-capa'>
-                    <h3 className='livro-titulo'>{livro.nome}</h3>
-                  </div>
-                  <div className='livro-informacoes'>
-                    <p className='livro-autor'>{livro.autor}</p>
-                    <p className='livro-geenero'>{livro.genero}</p>
-                    <p className='livro-status'>{livro.status}</p>
-                    <p className='livro-quantidade'>Quantidade: {livro.quantidade}</p>
-                  </div>
-                </article>
+                <button className="livro" key={livro.id} onClick={() => abrirDetalhes(livro)} styler={{'--livro-cor': obterCorLivro(livro.id)}}>
+                  <span className="livro-titulo">{livro.nome}</span>
+                </button>
               ))}
             </div>
         )}
@@ -77,6 +103,7 @@ function LivroLista() {
       {mostrarCadastro && <LivroInserir fechar={() => setMostrarCadastro(false)} atualizarLista={carrgarLivros} />}
       {mostrarEdicao && <LivroEditar livros={livros} fechar={() => setMostrarEdicao(false)} atualizarLista={carrgarLivros} />} 
       {mostrarExclusao && <LivroExcluir livros={livros} fechar={() => setMostrarExclusao(false)} atualizarLista={carrgarLivros} />}
+      {livroSelecionado && <LivroDetalhes livro={livroSelecionado} fechar={fecharDetalhes} editar={abrirEdicao} excluir={abrirExclusao}/>}
     </div>
   );
 }
