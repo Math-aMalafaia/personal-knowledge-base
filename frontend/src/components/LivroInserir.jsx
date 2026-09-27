@@ -34,41 +34,50 @@ function LivroInserir({ fechar, atualizarLista }) {
     };
 
     return (
-        <div>
-            <div>
-                <h2>Cadastrar livro</h2>
-                <button onClick={fechar}>
-                    X
-                </button>
+        <div className='modal-overlay'>
+            <div className='modal'>
+                <div className='modal-cabecalho'>
+                    <div>  
+                        <h2 className='modal-titulo'>Cadastrar livro</h2>
+                        <p className='modal-subtitulo'>Preencha os campos abaixo para cadastrar um novo livro.</p>
+                    </div>
+                    <button className='modal-fechar' onClick={fechar}>
+                        X
+                    </button>
+                </div>
+
+                <form className='formulario-livro' onSubmit={handleSubmit}>
+                    <div className='campo'>
+                        <label className='nome'>Nome do livro</label>
+                        <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Digite o nome do livro" required />
+                    </div>
+                    <div className='campo'>
+                        <label className='autor'>Autor:</label>
+                        <input id="autor" type="text" value={autor} onChange={(e) => setAutor(e.target.value)} placeholder="Digite o nome do autor" required />
+                    </div>
+                    <div className='campo'>
+                        <label className='genero'>Gênero:</label>
+                        <input id="genero" type="text" value={genero} onChange={(e) => setGenero(e.target.value)} placeholder="Digite o gênero do livro" required />
+                    </div>
+                    <div className='campo'>
+                        <label className='status'>Status:</label>
+                        <select id="status" value={status} onChange={(event) => setStatus(event.target.value)}>
+                            <option value="">Selecione</option>
+                            <option value="Nâo lido">Não lido</option>
+                            <option value="Lendo">Lendo</option>
+                            <option value="Lido">Lido</option>
+                        </select>
+                    </div>
+                    <div className='campo'>
+                        <label className='quantidade'>Quantidade:</label>
+                        <input id="quantidade" type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} placeholder="Digite a quantidade de livros" required />
+                    </div>
+                    <div className='formulario-acoes'>
+                        <button type="button" className='botao botao-secundario' onClick={fechar}>Cancelar</button>
+                        <button type="submit" className='botao botao-principal'>Cadastrar Livro</button>
+                    </div>
+                </form>
             </div>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Nome:</label>
-                    <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Autor:</label>
-                    <input type="text" value={autor} onChange={(e) => setAutor(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Gênero:</label>
-                    <input type="text" value={genero} onChange={(e) => setGenero(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Status:</label>
-                    <select value={status} onChange={(event) => setStatus(event.target.value)}>
-                        <option value="">Selecione</option>
-                        <option value="Nâo lido">Não lido</option>
-                        <option value="Lendo">Lendo</option>
-                        <option value="Lido">Lido</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Quantidade:</label>
-                    <input type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required />
-                </div>
-                <button type="submit">Cadastrar Livro</button>
-            </form>
         </div>
     );
 }
