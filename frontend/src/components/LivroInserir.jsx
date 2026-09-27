@@ -22,7 +22,6 @@ function LivroInserir({ fechar, atualizarLista }) {
         cadastrarLivro(Livro)
         .then(data => {
             console.log('Livro inserido:', data);
-            alert('Livro inserido com sucesso!');
 
             atualizarLista();
             fechar();

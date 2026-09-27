@@ -43,7 +43,6 @@
             atualizarLivro(livroSelecionado.id, Livro)
             .then(data => {
                 console.log('Livro Editado:', data);
-                alert('Livro editado com sucesso!');
 
                 atualizarLista();
                 fechar();

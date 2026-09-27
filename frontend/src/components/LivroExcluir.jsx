@@ -29,8 +29,6 @@ function LivroExcluir({livros, fechar, atualizarLista}) {
         .then(data => {
             console.log(data)
 
-            alert('Livro excluído com sucesso!');
-
             atualizarLista();
             fechar();
         })
