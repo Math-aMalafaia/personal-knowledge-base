@@ -434,6 +434,139 @@ AÇÕES DO FORMULÁRIO
   margin-top: var(--espaco-2);
 }
 
+/* 
+   SELEÇÃO DE LIVROS
+ */
+
+.seletor-livros {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-bottom: var(--espaco-3);
+}
+
+
+.seletor-livros-titulo {
+  color: var(--cor-texto);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* Área onde ficam os livros */
+
+.livros-selecao {
+  display: flex;
+  align-items: flex-end;
+
+  gap: 8px;
+
+  width: 100%;
+
+  padding: 16px 12px 12px;
+
+  overflow-x: auto;
+
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+
+  background-color: var(--cor-madeira-escura);
+}
+
+
+/* Cada livro */
+
+.livro-selecao {
+  position: relative;
+
+  flex: 0 0 55px;
+
+  width: 55px;
+  height: 130px;
+
+  padding: 8px 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid transparent;
+  border-radius: 3px 5px 5px 3px;
+
+  background-color: var(--cor-madeira);
+
+  color: var(--cor-texto);
+
+  cursor: pointer;
+
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform var(--transicao),
+    border-color var(--transicao),
+    box-shadow var(--transicao);
+}
+
+
+.livro-selecao:hover {
+  transform: translateY(-8px);
+
+  box-shadow: 3px 8px 10px rgba(0, 0, 0, 0.4);
+}
+
+
+/* Nome escrito na lombada */
+
+.livro-selecao-titulo {
+  display: block;
+
+  max-height: 105px;
+
+  overflow: hidden;
+
+  writing-mode: vertical-rl;
+
+  text-orientation: mixed;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* Livro selecionado */
+
+.livro-selecao-ativo {
+  border-color: var(--cor-dourado);
+
+  transform: translateY(-12px);
+
+  box-shadow:
+    0 0 0 2px rgba(200, 155, 85, 0.2),
+    3px 10px 15px rgba(0, 0, 0, 0.45);
+}
+
+
+.livro-selecao-ativo::after {
+  content: '';
+
+  position: absolute;
+
+  bottom: -8px;
+  left: 8px;
+  right: 8px;
+
+  height: 3px;
+
+  background-color: var(--cor-dourado);
+
+  border-radius: 2px;
+}
+
 /*
    RESPONSIVIDADE
 */
