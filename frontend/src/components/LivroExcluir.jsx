@@ -5,8 +5,7 @@ function LivroExcluir({livros, fechar, atualizarLista}) {
     const [livroSelecionado, setLivroSelecionado] = useState(null);
     const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
-    const selecionarLivro = (event) => {
-        const id = Number(event.target.value);
+    const selecionarLivro = (id) => {
         const livro = livros.find((livro) => livro.id === id);
         if (!livro) {
             setLivroSelecionado(null);
@@ -16,8 +15,16 @@ function LivroExcluir({livros, fechar, atualizarLista}) {
         setLivroSelecionado(livro);
         setMostrarConfirmacao(true);
     };
+    
+    const cancelarExclusao = () => {
+        setMostrarConfirmacao(false);
+    };
 
     const confirmarExclusao = () => {
+
+        if (!livroSelecionado) {
+            return;
+        }
         deletarLivro(livroSelecionado.id)
         .then(data => {
             console.log(data)
@@ -34,65 +41,55 @@ function LivroExcluir({livros, fechar, atualizarLista}) {
     };
 
     return (
-        <div>
-            <div>
-                <h2>Excluir livro</h2>
-                <button onClick={fechar}>
-                    X
-                </button>
-            </div>
+        <div className='modal-overlay'>
+            <div className='modal'>
+                <div className='modal-cabecalho'>
+                    <h2 className='modal-titulo'>Excluir livro</h2>
+                    <p className='modal-subtitulo'>Selecione o livro que deseja remover da biblioteca.</p>
+                    <button className='modal-fechar' onClick={fechar}>
+                        X
+                    </button>
+                </div>
 
-            <div>
-                <label> Escolhar um Livro</label>
-                <select value={livroSelecionado ? livroSelecionado.id : ''} onChange={selecionarLivro}>
-                    <option value="">Selecione um livro</option>
+            <div className='seletor-livros'>
+                <label className='seletor-livros-titulo'>Escolha um Livro</label>
+                <div className='livros-selecao'>
                     {livros.map((livro) => (
-                        <option key={livro.id} value={livro.id}>
-                            {livro.nome}
-                        </option>
+                        <button key={livro.id} type="button" className={`livro-selecao ${livroSelecionado?.id === livro.id ? 'livro-selecao-ativo' : ''}`} onClick={() => selecionarLivro(livro.id)}>
+                            <span className='livro-selecao-titulo'>{livro.nome}</span>
+                        </button>
                     ))}
-                </select>
+                </div>
             </div>
             
-            {livroSelecionado && !mostrarConfirmacao && (
-                <div>
-                    <h3>Livro selecionando</h3>
-                    <p>
-                        <strong>Nome:</strong> {livroSelecionado.nome}
-                    </p>
-
-                    <p>
-                        <strong>Autor:</strong> {livroSelecionado.autor}
-                    </p>
-
-                    <p>
-                        <strong>Gênero:</strong> {livroSelecionado.genero}
-                    </p>
-
-                    <p>
-                        <strong>Status:</strong> {livroSelecionado.status}
-                    </p>
-
-                    <p>
-                        <strong>Quantidade:</strong> {livroSelecionado.quantidade}
-                    </p>
-
-                    <button onClick={() => setMostrarConfirmacao(true)}>Excluir este Livro</button>
+            {livroSelecionado && (
+                <div className='livro-selecionado-info'>
+                    <span>Livro selecionado</span>
+                    <strong>{livroSelecionado.nome}</strong>
                 </div>
             )}
 
-            {livroSelecionado && mostrarConfirmacao && (
-                <div>
-                    <h3>Confirmação de exclusão</h3>
-                    <p>Tem certeza que deseja excluir o livro "{livroSelecionado.nome}"?</p>
-                    <button onClick={confirmarExclusao}>
-                        Sim, Excluir.
-                    </button>
-                    <button onClick={() => setMostrarConfirmacao(false)}>
+            {mostrarConfirmacao && livroSelecionado && (
+                <div className='confirmacao-exclusao'>
+                    <div className='confirmacao-icone'>
+                        !
+                    </div>
+                    <div className='Confirmacao-conteudo'>
+                        <h3>Atenção</h3>
+                        <p>Você está prestes a excluir o livro <strong>{livroSelecionado.nome}</strong>.</p>
+                        <p>Essa ação não pode ser desfeita</p>
+                    </div>
+                </div>
+            )}
+                <div className='formulario-acoes'>
+                    <button type="button" className="botao botao-secundario" onClick={mostrarConfirmacao ? cancelarExclusao : fechar}>
                         Cancelar
                     </button>
+                    <button type="button" className="botao botao-principal" disabled={!livroSelecionado} onClick={confirmarExclusao}>
+                        Excluir livro
+                    </button>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

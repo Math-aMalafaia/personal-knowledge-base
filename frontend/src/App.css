@@ -567,6 +567,78 @@ AÇÕES DO FORMULÁRIO
   border-radius: 2px;
 }
 
+/* 
+   CONFIRMAÇÃO DE EXCLUSÃO
+*/
+
+.confirmacao-exclusao {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 12px;
+
+  margin-top: var(--espaco-3);
+  padding: 14px;
+
+  border: 1px solid rgba(166, 83, 83, 0.5);
+  border-radius: var(--raio-medio);
+
+  background-color: rgba(166, 83, 83, 0.08);
+}
+
+
+/* Ícone */
+
+.confirmacao-icone {
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background-color: var(--cor-perigo);
+
+  color: white;
+
+  font-weight: 700;
+}
+
+
+/* Conteúdo */
+
+.confirmacao-conteudo {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.confirmacao-conteudo h3 {
+  color: var(--cor-perigo);
+
+  font-size: 15px;
+}
+
+
+.confirmacao-conteudo p {
+  color: var(--cor-texto-secundario);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.confirmacao-conteudo strong {
+  color: var(--cor-texto);
+}
+
 /*
    RESPONSIVIDADE
 */
