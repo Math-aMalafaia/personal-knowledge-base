@@ -29,6 +29,7 @@
 }
 
 
+
 /*
    IDENTIDADE
 */
@@ -174,6 +175,58 @@
   filter: brightness(1.1);
 }
 
+/*
+   ESTATÍSTICAS
+*/
+
+.estatisticas {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: var(--espaco-3);
+
+  margin-bottom: var(--espaco-5);
+}
+
+
+.estatistica {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  padding: var(--espaco-3);
+
+  background-color: var(--cor-fundo-secundario);
+
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+
+  box-shadow: var(--sombra-leve);
+}
+
+
+.estatistica-label {
+  color: var(--cor-texto-secundario);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+
+.estatistica-valor {
+  color: var(--cor-dourado);
+
+  font-size: 32px;
+  font-weight: 700;
+
+  line-height: 1;
+}
 
 /*
    ESTANTE

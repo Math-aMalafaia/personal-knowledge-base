@@ -58,3 +58,13 @@ export async function deletarLivro(id, livro){
 
     return data;
 }
+
+export async function buscarEstatisticas(){
+    const response = await fetch(`${API_URL}/api/livros/estatisticas`);
+
+    if (!response.ok){
+        throw new Error('Erro ao buscar estatisticas dos livros')
+    }
+
+    return response.json();
+}

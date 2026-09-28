@@ -1,5 +1,5 @@
 import {useEffect, useState } from 'react';
-import { buscarLivros } from '../services/api';
+import { buscarLivros, buscarEstatisticas } from '../services/api';
 import LivroInserir from './LivroInserir';
 import LivroEditar from './LivroEditar';
 import LivroExcluir from './LivroExcluir';
@@ -7,23 +7,33 @@ import LivroDetalhes from './LivroDetalhes';
 
 function LivroLista() {
   const [livros, setLivros] = useState([]);
+  const [estatisticas, setEstatisticas] = useState({
+    total: 0,
+    lidos: 0,
+    naoLidos: 0,
+    lendo: 0
+  });
   const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [mostrarEdicao, setMostrarEdicao] = useState(false);
   const [mostrarExclusao, setMostrarExclusao] = useState(false);
   const [livroSelecionado, setLivroSelecionado] = useState(null);
 
-  const carrgarLivros = () => {
-    buscarLivros()
-    .then(data => {
-      setLivros(data);
+  const carregarLivros = () => {
+    Promise.all([
+      buscarLivros(),
+      buscarEstatisticas()
+    ])
+    .then(([livrosData, estatisticasData]) => {
+      setLivros(livrosData);
+      setEstatisticas(estatisticasData);
     })
     .catch(error => {
-      console.error('Erro ao buscar livros:', error);
+      console.error('Erro ao buscar dados da biblioteca:', error);
     });
-  }
+  };
 
   useEffect(() => {
-    carrgarLivros();
+    carregarLivros();
   }, []);
 
   const coresLivros = [
@@ -65,12 +75,31 @@ function LivroLista() {
       <header className='biblioteca-cabecalho'>
         <div className='biblioteca-identidade'>
           <h1 className='biblioteca-titulo'>A Grande Biblioteca</h1>
-          <p className='biblioteca-subtitilo'>Bem-vindo à nossa biblioteca virtual!</p>
+          <p className='biblioteca-subtitulo'>Bem-vindo à nossa biblioteca virtual!</p>
         </div>
       </header>
 
 
       <main className='biblioteca-conteudo'>
+
+        <section className='estatisticas'>
+          <div className='estatistica'>
+            <span className='estatistica-label'>Total de livros</span>
+            <strong className='estatistica-valor'>{estatisticas.total}</strong>
+          </div>
+          <div className='estatistica'>
+            <span className='estatistica-label'>Livros lidos</span>
+            <strong className='estatistica-valor'>{estatisticas.lidos}</strong>
+          </div>
+          <div className='estatistica'>
+            <span className='estatistica-label'>Livros não lidos</span>
+            <strong className='estatistica-valor'>{estatisticas.naoLidos}</strong>
+          </div>
+          <div className='estatistica'>
+            <span className='estatistica-label'>Livros lendo</span>
+            <strong className='estatistica-valor'>{estatisticas.lendo}</strong>
+          </div>
+        </section>
 
         <div className='biblioteca-acoes'>
           <h2 className='biblioteca-acoes-titulo'>Minha Estante</h2>
@@ -81,7 +110,7 @@ function LivroLista() {
           </div>
         </div>
 
-        <section classname='estante'>
+        <section className='estante'>
 
           {livros.length === 0 ? (
             <div className='estante-vazia'>
@@ -90,7 +119,7 @@ function LivroLista() {
           ) : (
             <div className='prateleira'>
               {livros.map((livro) => (
-                <button className="livro" key={livro.id} onClick={() => abrirDetalhes(livro)} styler={{'--livro-cor': obterCorLivro(livro.id)}}>
+                <button className="livro" key={livro.id} onClick={() => abrirDetalhes(livro)} style={{'--livro-cor': obterCorLivro(livro.id)}}>
                   <span className="livro-titulo">{livro.nome}</span>
                 </button>
               ))}
@@ -100,9 +129,9 @@ function LivroLista() {
         
       </main>
 
-      {mostrarCadastro && <LivroInserir fechar={() => setMostrarCadastro(false)} atualizarLista={carrgarLivros} />}
-      {mostrarEdicao && <LivroEditar livros={livros} fechar={() => setMostrarEdicao(false)} atualizarLista={carrgarLivros} />} 
-      {mostrarExclusao && <LivroExcluir livros={livros} fechar={() => setMostrarExclusao(false)} atualizarLista={carrgarLivros} />}
+      {mostrarCadastro && <LivroInserir fechar={() => setMostrarCadastro(false)} atualizarLista={carregarLivros} />}
+      {mostrarEdicao && <LivroEditar livros={livros} fechar={() => setMostrarEdicao(false)} atualizarLista={carregarLivros} />} 
+      {mostrarExclusao && <LivroExcluir livros={livros} fechar={() => setMostrarExclusao(false)} atualizarLista={carregarLivros} />}
       {livroSelecionado && <LivroDetalhes livro={livroSelecionado} fechar={fecharDetalhes} editar={abrirEdicao} excluir={abrirExclusao}/>}
     </div>
   );

@@ -142,3 +142,35 @@ app.delete('/api/livros/:id', (req, res) => {
     );
 });
 
+app.get('/api/livros/estatisticas', (req, res) => {
+    const sql = `
+        SELECT
+            COALESCE(SUM(quantidade), 0) AS total,
+            COALESCE(SUM(
+                CASE
+                    WHEN status = 'Lido' THEN quantidade
+                    ELSE 0
+                END
+            ), 0) AS lidos,
+            COALESCE(SUM(
+                CASE
+                    WHEN status = 'Lendo' THEN quantidade
+                    ELSE 0
+                END
+            ), 0) AS lendo,
+            COALESCE(SUM(
+                CASE
+                    WHEN status = 'Não lido' OR status = 'Nâo lido'
+                    THEN quantidade
+                    ELSE 0
+                END
+            ), 0) AS naoLidos
+        FROM livros`;
+    conn.query(sql, (err, result) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).json({error: 'Erro ao buscar estatísticas dos livros'});
+        }
+        res.status(200).json(result[0]);
+    });
+});

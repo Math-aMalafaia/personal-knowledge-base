@@ -94,7 +94,7 @@
                                 <label className='status'>Status:</label>
                                 <select id="status" value={status} onChange={(event) => setStatus(event.target.value)}>
                                     <option value="">Selecione</option>
-                                    <option value="Nâo lido">Não lido</option>
+                                    <option value="Não lido">Não lido</option>
                                     <option value="Lendo">Lendo</option>
                                     <option value="Lido">Lido</option>
                                 </select>
