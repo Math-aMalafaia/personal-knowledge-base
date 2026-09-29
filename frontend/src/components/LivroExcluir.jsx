@@ -63,7 +63,7 @@ function LivroExcluir({livros, fechar, atualizarLista}) {
             {livroSelecionado && (
                 <div className='livro-selecionado-info'>
                     <span>Livro selecionado</span>
-                    <strong>{livroSelecionado.nome}</strong>
+                    <strong> {livroSelecionado.nome}</strong>
                 </div>
             )}
 
