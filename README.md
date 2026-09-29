@@ -314,7 +314,7 @@ Dessa forma, o próprio projeto evolui junto com o conhecimento adquirido durant
 
 ## 👨‍💻 Autor
 
-Desenvolvido por **Math**.
+Desenvolvido por **Mathaus Gomes**.
 
 Projeto criado para estudos e prática de desenvolvimento de sistemas.
 
