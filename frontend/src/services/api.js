@@ -42,13 +42,9 @@ export async function atualizarLivro(id, livro) {
     return data;
 }
 
-export async function deletarLivro(id, livro){
+export async function deletarLivro(id){
     const response = await fetch(`${API_URL}/api/livros/${id}`, {
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(livro)
     });
 
     const data = await response.json();
@@ -67,4 +63,61 @@ export async function buscarEstatisticas(){
     }
 
     return response.json();
+}
+
+export async function buscarAutores() {
+    const response = await fetch(`${API_URL}/api/autores`);
+
+    if (!response.ok){
+        throw new Error('Erro ao buscar autores');
+    }
+    return response.json();
+}
+
+export async function cadastrarAutor(nome){
+    
+    const response = await fetch(`${API_URL}/api/autores`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({nome})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao cadastrar autor')
+    }
+
+    return data;
+}
+
+export async function buscarGeneros(){
+    const response = await fetch(`${API_URL}/api/generos`);
+
+    if(!response.ok){
+        throw new Error('Erro ao buscar generos');
+    }
+    const data = await response.json();
+    return data;
+}
+
+export async function cadastrarGenero(nome){
+
+    const response = await fetch(`${API_URL}/api/generos`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({nome})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao cadasstrar gênero')
+    }
+
+    return data;
 }

@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');    
+const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
@@ -19,7 +19,7 @@ const conn = mysql.createConnection({
     user: 'root',
     password: '2606',
     database: 'crud_livros'
-})
+});
 
 conn.connect(function(err) {
     if (err) {
@@ -27,92 +27,183 @@ conn.connect(function(err) {
         return;
     }
 
-    console.log('Conectado ao MySQL!')
+    console.log('Conectado ao MySQL!');
 
     app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
+        console.log('Servidor rodando em http://localhost:3000');
     });
-})
+});
 
-/* Rota pricipal */
+/* Rota principal */
 
 app.get('/', (req, res) => {
     res.json({ message: 'Bem-vindo à API de livros!' });
 });
 
+/* =========================================================
+   LIVROS
+   ========================================================= */
+
 /* Rota para exibir a lista de livros */
 
 app.get('/api/livros', (req, res) => {
 
-    const sql = 'SELECT * FROM livros';
+    const sql = `
+        SELECT
+            l.id,
+            l.nome,
+            l.autor_id,
+            a.nome AS autor,
+            l.genero_id,
+            g.nome AS genero,
+            l.status,
+            l.quantidade
+        FROM livros l
+        INNER JOIN autores a ON l.autor_id = a.id
+        INNER JOIN generos g ON l.genero_id = g.id
+        ORDER BY l.id;
+    `;
 
     conn.query(sql, (err, data) => {
 
         if (err) {
             console.log(err);
-            return res.status(500).json({ error: 'Erro ao buscar livros' });
+            return res.status(500).json({
+                error: 'Erro ao buscar livros'
+            });
         }
 
         res.status(200).json(data);
     });
 });
 
-/* Cadastrar */
+/* =========================================================
+   CADASTRAR LIVRO
+   ========================================================= */
 
 app.post('/api/livros/inserir', (req, res) => {
-    const {nome, autor, genero, status, quantidade} = req.body;
 
-    if (!nome || !autor || !genero || !status || !quantidade) {
-        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    const {
+        nome,
+        autor_id,
+        genero_id,
+        status,
+        quantidade
+    } = req.body;
+
+    if (
+        !nome ||
+        !autor_id ||
+        !genero_id ||
+        !status ||
+        quantidade === undefined ||
+        quantidade === null
+    ) {
+        return res.status(400).json({
+            error: 'Todos os campos são obrigatórios'
+        });
     }
 
-    const sql = `INSERT INTO livros (nome, autor, genero, status, quantidade) VALUES (?, ?, ?, ?, ?)`;
+    const sql = `
+        INSERT INTO livros
+        (nome, autor_id, genero_id, status, quantidade)
+        VALUES (?, ?, ?, ?, ?)
+    `;
 
     conn.query(
         sql,
-        [nome, autor, genero, status, quantidade],
-        (err) => {
+        [nome, autor_id, genero_id, status, quantidade],
+        (err, result) => {
+
             if (err) {
                 console.log(err);
-                return res.status(500).json({ error: 'Erro ao inserir livro' });
+
+                return res.status(500).json({
+                    error: 'Erro ao inserir livro'
+                });
             }
-            return res.status(201).json({ message: 'Livro inserido com sucesso',  });
-        });
+
+            return res.status(201).json({
+                message: 'Livro inserido com sucesso',
+                id: result.insertId
+            });
+        }
+    );
 });
 
-/* Atualizar */
+/* =========================================================
+   ATUALIZAR LIVRO
+   ========================================================= */
 
 app.put('/api/livros/:id', (req, res) => {
 
     const id = req.params.id;
 
-    const {nome, autor, genero, status, quantidade} = req.body;
+    const {
+        nome,
+        autor_id,
+        genero_id,
+        status,
+        quantidade
+    } = req.body;
 
-    if (!nome || !autor || !genero || !status || !quantidade) {
-        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    if (
+        !nome ||
+        !autor_id ||
+        !genero_id ||
+        !status ||
+        quantidade === undefined ||
+        quantidade === null
+    ) {
+        return res.status(400).json({
+            error: 'Todos os campos são obrigatórios'
+        });
     }
 
-    const sql = `UPDATE livros SET nome = ?, autor = ?, genero = ?, status = ?, quantidade = ? WHERE id = ?`;
+    const sql = `
+        UPDATE livros
+        SET
+            nome = ?,
+            autor_id = ?,
+            genero_id = ?,
+            status = ?,
+            quantidade = ?
+        WHERE id = ?
+    `;
 
     conn.query(
         sql,
-        [nome, autor, genero, status, quantidade, id],
+        [
+            nome,
+            autor_id,
+            genero_id,
+            status,
+            quantidade,
+            id
+        ],
         (err, result) => {
+
             if (err) {
                 console.log(err);
-                return res.status(500).json({ error: 'Erro ao atualizar livro' });
+
+                return res.status(500).json({
+                    error: 'Erro ao atualizar livro'
+                });
             }
 
             if (result.affectedRows === 0) {
-                return res.status(404).json({ error: 'Livro não encontrado' });
+                return res.status(404).json({
+                    error: 'Livro não encontrado'
+                });
             }
-            return res.status(200).json({ 
+
+            return res.status(200).json({
                 message: 'Livro atualizado com sucesso',
-                livro   : {
+                livro: {
                     id,
                     nome,
-                    autor,
-                    genero,
+                    autor_id,
+                    genero_id,
                     status,
                     quantidade
                 }
@@ -121,56 +212,240 @@ app.put('/api/livros/:id', (req, res) => {
     );
 });
 
-/* Deletar */
+/* =========================================================
+   DELETAR LIVRO
+   ========================================================= */
 
 app.delete('/api/livros/:id', (req, res) => {
-    const id = req.params.id
+
+    const id = req.params.id;
 
     const sql = 'DELETE FROM livros WHERE id = ?';
 
     conn.query(sql, [id], (err, result) => {
+
         if (err) {
             console.log(err);
-            return res.status(500).json({ error: 'Erro ao deletar livro' });
+
+            return res.status(500).json({
+                error: 'Erro ao deletar livro'
+            });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Livro não encontrado' });
+            return res.status(404).json({
+                error: 'Livro não encontrado'
+            });
         }
-            return res.status(200).json({ message: 'Livro deletado com sucesso' });
-        }
-    );
+
+        return res.status(200).json({
+            message: 'Livro deletado com sucesso'
+        });
+    });
 });
 
+/* =========================================================
+   ESTATÍSTICAS
+   ========================================================= */
+
 app.get('/api/livros/estatisticas', (req, res) => {
+
     const sql = `
         SELECT
             COALESCE(SUM(quantidade), 0) AS total,
+
             COALESCE(SUM(
                 CASE
-                    WHEN status = 'Lido' THEN quantidade
+                    WHEN status = 'Lido'
+                    THEN quantidade
                     ELSE 0
                 END
             ), 0) AS lidos,
+
             COALESCE(SUM(
                 CASE
-                    WHEN status = 'Lendo' THEN quantidade
+                    WHEN status = 'lendo'
+                    THEN quantidade
                     ELSE 0
                 END
             ), 0) AS lendo,
+
             COALESCE(SUM(
                 CASE
-                    WHEN status = 'Não lido' OR status = 'Nâo lido'
+                    WHEN status = 'Não lido'
                     THEN quantidade
                     ELSE 0
                 END
             ), 0) AS naoLidos
-        FROM livros`;
+
+        FROM livros;
+    `;
+
     conn.query(sql, (err, result) => {
+
         if (err) {
             console.log(err);
-            return res.status(500).json({error: 'Erro ao buscar estatísticas dos livros'});
+
+            return res.status(500).json({
+                error: 'Erro ao buscar estatísticas dos livros'
+            });
         }
+
         res.status(200).json(result[0]);
+    });
+});
+
+/* =========================================================
+   AUTORES
+   ========================================================= */
+
+/* Listar autores */
+
+app.get('/api/autores', (req, res) => {
+
+    const sql = `
+        SELECT id, nome
+        FROM autores
+        ORDER BY nome ASC
+    `;
+
+    conn.query(sql, (err, data) => {
+
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+                error: 'Erro ao buscar autores'
+            });
+        }
+
+        res.status(200).json(data);
+    });
+});
+
+/* Cadastrar autores */
+
+app.post('/api/autores', (req, res) => {
+
+    const { nome } = req.body;
+
+    if (!nome || !nome.trim()) {
+        return res.status(400).json({error: 'O nome do autor é obrigatório'});
+    }
+
+    const nomeAutor = nome.trim();
+
+    /* Verificar se ja existe */
+
+    const sqlVerificar = `
+        SELECT id, nome
+        FROM autores
+        WHERE nome = ?
+    `;
+
+    conn.query(sqlVerificar, [nomeAutor], (err, date) => {
+        
+        if (err) {
+            console.lo(err);
+            
+            return res.status(500).json({erro: 'Erro ao verificar autor'});
+        }
+
+        /* Autor ja existe */
+
+        if (data.length > 0) {
+            return res.status(409).json({erro: 'Este autor já esta cadastrado', autor: data[0]});
+        }
+
+        /* Cadastrar novo autor */
+
+        const sqlInserir = `
+            INSERT INTO autores (nome)
+            VALUES (?)
+        `;
+
+        conn.query(sqlIserir, [nomeAutor], (err, result) => {
+            
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({error: 'Erro ao cadastra autor'})
+            }
+            return res.status(201).json({message: 'Autor cadastrado com sucesso', autor: {id: result.insertId, nome: nomeAutor}});
+        });
+    });
+});
+/* =========================================================
+   GÊNEROS
+   ========================================================= */
+
+/* Listar gêneros */
+
+app.get('/api/generos', (req, res) => {
+
+    const sql = `
+        SELECT id, nome
+        FROM generos
+        ORDER BY nome ASC
+    `;
+
+    conn.query(sql, (err, data) => {
+
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({
+                error: 'Erro ao buscar gêneros'
+            });
+        }
+
+        res.status(200).json(data);
+    });
+});
+
+app.post('/api/generos', (req, res) => {
+    
+    const { nome } = req.body;
+
+    if (!nome || nome.trim()) {
+        return res.status(400).json({error: 'O nomo do gênero é obrigatóriio'});
+    }
+
+    const nomeGenero = nome.trim();
+
+    /* Verificar se ja existe */
+
+    const sqlVerificar = `
+    SELECT id, nome
+    FROM generos
+    WHERE nome = ?
+    `;
+
+    conn.query(sqlVerificar, [nomeGenero], (err, data) => {
+
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({error: 'Erro ao buscar gêneros'});
+        }
+
+        res.status(200).json(data);
+    });
+
+    /* Cadastra gênero */
+
+    const sqlInserir = `
+    INSERT INTO generos (nome)
+    VALUES (?)
+    `;
+
+    conn.query(sqlInserir, [nomeGenero], (err, result) => {
+        if (err) {
+            console.log(err);
+
+            return res.status(500).json({error: 'Erro ao cadastrar gênero'});
+        }
+
+        return res.status(201).json({message: 'Gênero cadastrado com sucesso', gênero: {id: result.insertId, nome: nomeGenero}})
     });
 });
