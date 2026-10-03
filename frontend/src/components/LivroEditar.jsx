@@ -1,57 +1,92 @@
-    import { useState } from 'react';
-    import { atualizarLivro } from '../services/api';
+    import { useEffect, useState } from 'react';
+    import { atualizarLivro,  buscarAutores, buscarGeneros  } from '../services/api';
 
     function LivroEditar({ livros, fechar, atualizarLista }) {
         const [livroSelecionado, setLivroSelecionado] = useState(livros[0] || null);
     const [nome, setNome] = useState('');
-    const [autor, setAutor] = useState('');
-    const [genero, setGenero] = useState('');
+    const [autorId, setAutorId] = useState('');
+    const [generoId, setGeneroId] = useState('');
     const [status, setStatus] = useState('');
     const [quantidade, setQuantidade] = useState('');
 
+    const [autores, setAutores] = useState([]);
+    const [generos, setGeneros] = useState([]);
+
+    useEffect(() => {
+        async function carregarDados(){
+            try{
+                const [autoresData, generosData] = await Promise.all([
+                    buscarAutores(),
+                    buscarGeneros()
+                ]);
+                setAutores(autoresData);
+                setGeneros(generosData);
+            } catch (error) {
+                console.log('Erro ao carregar os autores',  error);
+                alert('Error ao carregar os autores');
+            }
+        }
+
+        carregarDados();
+    }, []);
+
+    useEffect(() => {
+        if (!livroSelecionado){
+            setNome('');
+            setAutorId('');
+            setGeneroId('');
+            setStatus('');
+            setQuantidade('');
+            return;
+        }
+
+        setNome(livroSelecionado.nome);
+        setAutorId(String(livroSelecionado.autor_id));
+        setGeneroId(String(livroSelecionado.genero_id));
+        setStatus(livroSelecionado.status);
+        setQuantidade(livroSelecionado.qunatidade);
+    }, [livroSelecionado]);
+
     const selecinarLivro = (id) => {
-        const livro = livros.find(
+        const livro = livro.find(
             (livro) => livro.id === id
         );
 
         if (!livro){
-            setLivroSelecionado(null);
+            setLivroSelecionado(null)
             return;
         }
 
         setLivroSelecionado(livro);
-
-        setNome(livro.nome);
-        setAutor(livro.autor);
-        setGenero(livro.genero);
-        setStatus(livro.status);
-        setQuantidade(livro.quantidade);
-
     };
 
-        const handleSubmit = (event) => {
-            event.preventDefault();
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-            const Livro = {
-                nome,
-                autor,
-                genero,
-                status,
-                quantidade
-            };
+        if (!livroSelecionado) {
+            return;
+        }
 
-            atualizarLivro(livroSelecionado.id, Livro)
-            .then(data => {
-                console.log('Livro Editado:', data);
-
-                atualizarLista();
-                fechar();
-            })
-            .catch(error => {
-                console.error('Erro ao editar livro:', error);
-                alert('Erro ao editar livro. Por favor, tente novamente.');
-            });
+        const livroAtualizado = {
+            nome,
+            autor_id: Number(autorId),
+            genero_id: Number(generoId),
+            status,
+            quantidade: Number(quantidade)
         };
+
+        try {
+            const data = await atualizarLivro(livroSelecionado.id, livroAtualizado);
+
+            console.log('Livro Editado', data);
+
+            atualizarLista();
+            fechar();
+        } catch (error) {
+            console.errer('Error ao editar livro:', error);
+            alert(error.messsage || 'Erro ao editar livro, tente novamente');
+        }
+    };
 
         return (
             <div className="modal-overlay">
@@ -84,11 +119,25 @@
                             </div>
                             <div className='campo'>
                                 <label className='autor'>Autor:</label>
-                                <input id="autor" type="text" value={autor} onChange={(e) => setAutor(e.target.value)} required />
+                                <select id="autor" type="text" value={autorId} onChange={(e) => setAutorId(e.target.value)} required>
+                                    <option value=""> Selecione um autor</option>
+                                    {autores.map((autor) => (
+                                        <option key={autor.id} value={autor.id}>
+                                            {autor.nome}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className='campo'>
                                 <label className='genero'>Gênero:</label>
-                                <input id="genero" type="text" value={genero} onChange={(e) => setGenero(e.target.value)} required />
+                                <select id="genero" type="text" value={generoId} onChange={(e) => setGeneroId(e.target.value)} required>
+                                    <option value=""> Selecione um genero</option>
+                                    {generos.map((genero) => (
+                                        <option key={genero.id} value={genero.id}>
+                                            {genero.nome}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div className='campo'>
                                 <label className='status'>Status:</label>
@@ -101,11 +150,11 @@
                             </div>
                             <div className='campo'>
                                 <label className='quantidade'>Quantidade:</label>
-                                <input id="quantidade" type="number" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required />
+                                <input id="quantidade" type="number" min="1" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required />
                             </div>
                             <div className='formulario-acoes'>
                                 <button type="button" className='botao botao-secundario' onClick={fechar}>Cancelar</button>
-                                <button type="submit" className='botao botao-principal'>Cadastrar Livro</button>
+                                <button type="submit" className='botao botao-principal'>Salvar auteração</button>
                             </div>
                         </form>
                     )}
