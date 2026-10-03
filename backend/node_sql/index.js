@@ -343,7 +343,7 @@ app.post('/api/autores', (req, res) => {
         WHERE nome = ?
     `;
 
-    conn.query(sqlVerificar, [nomeAutor], (err, date) => {
+    conn.query(sqlVerificar, [nomeAutor], (err, data) => {
         
         if (err) {
             console.lo(err);
@@ -364,7 +364,7 @@ app.post('/api/autores', (req, res) => {
             VALUES (?)
         `;
 
-        conn.query(sqlIserir, [nomeAutor], (err, result) => {
+        conn.query(sqlInserir, [nomeAutor], (err, result) => {
             
             if (err) {
                 console.log(err);
@@ -407,8 +407,8 @@ app.post('/api/generos', (req, res) => {
     
     const { nome } = req.body;
 
-    if (!nome || nome.trim()) {
-        return res.status(400).json({error: 'O nomo do gênero é obrigatóriio'});
+    if (!nome || !nome.trim()) {
+        return res.status(400).json({error: 'O nome do genero é obrigatório'});
     }
 
     const nomeGenero = nome.trim();
@@ -429,23 +429,26 @@ app.post('/api/generos', (req, res) => {
             return res.status(500).json({error: 'Erro ao buscar gêneros'});
         }
 
-        res.status(200).json(data);
-    });
-
-    /* Cadastra gênero */
-
-    const sqlInserir = `
-    INSERT INTO generos (nome)
-    VALUES (?)
-    `;
-
-    conn.query(sqlInserir, [nomeGenero], (err, result) => {
-        if (err) {
-            console.log(err);
-
-            return res.status(500).json({error: 'Erro ao cadastrar gênero'});
+        if (data.length > 0) {
+            return res.status(409).json({erro: 'Este genero já esta cadastrado', genero: data[0]})
         }
 
-        return res.status(201).json({message: 'Gênero cadastrado com sucesso', gênero: {id: result.insertId, nome: nomeGenero}})
+        /* Cadastra gênero */
+
+
+        const sqlInserir = `
+        INSERT INTO generos (nome)
+        VALUES (?)
+        `;
+
+        conn.query(sqlInserir, [nomeGenero], (err, result) => {
+            
+            if (err) {
+                console.log(err);
+
+                return res.status(500).json({error: 'Erro ao cadastra autor'})
+            }
+            return res.status(201).json({message: 'Autor cadastrado com sucesso', genero: {id: result.insertId, nome: nomeGenero}});
+        });
     });
 });

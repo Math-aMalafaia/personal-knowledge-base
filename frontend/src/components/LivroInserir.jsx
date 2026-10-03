@@ -73,7 +73,7 @@ function LivroInserir({ fechar, atualizarLista }) {
             setMostrarNovoAutor(false);
         } catch (error) {
             console.error('Erro ao cadastrar autor');
-            alert(error.message);
+            alert(`Erro ao cadastrar autor: ${error.menssage}`);
         } finally {
             setCadastrandoAutor(false);
         }
