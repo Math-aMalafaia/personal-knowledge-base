@@ -1,11 +1,38 @@
 require('dotenv').config();
+
+const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const session = require('express-session');
+
+const MySQLStore  = require('express-mysql-session')(session);
 
 const app = express();
 
-app.use(cors());
+const dbConfig = {
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: Number(process.env.DB_PORT)
+};
+
+const conn = mysql.createConnection(dbConfig);
+
+/* Conexão com Mysql */
+
+const sessionStore = new MySQLStore({
+    ...dbConfig,
+    clearExpired: true,
+    checkExpirationInterval: 900000,
+    expiration: 86400000
+});
+
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}));
 
 app.use(express.json());
 
@@ -13,19 +40,27 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-/* Conexão com Mysql */
+if (!process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET não foi configurado no .env');
+}
 
-const conn = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT)
-});
+app.use(session({
+    name: 'crud.sid',
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000
+    }
+}));
 
 conn.connect(function(err) {
     if (err) {
-        console.log('Erro ao conectar ao Mysql:', err);
+        console.log('Erro ao conectar ao MySQL:', err);
         return;
     }
 
@@ -33,6 +68,221 @@ conn.connect(function(err) {
 
     app.listen(3000, () => {
         console.log('Servidor rodando em http://localhost:3000');
+    });
+});
+
+/* =========================================================
+   cadastro
+   ========================================================= */ 
+
+app.post('/api/auth/cadastro', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body;
+
+        // Validar campos
+        if (!nome || !email || !senha) {
+            return res.status(400).json({
+                error: 'Nome, email e senha são obrigatórios.'
+            });
+        }
+
+        const nomeUsuario = nome.trim();
+        const emailUsuario = email.trim().toLowerCase();
+
+        if (!nomeUsuario || nomeUsuario.length > 100) {
+            return res.status(400).json({
+                error: 'O nome deve ter entre 1 e 100 caracteres.'
+            });
+        }
+
+        if (emailUsuario.length > 150 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailUsuario)) {
+            return res.status(400).json({
+                error: 'Informe um email válido.'
+            });
+        }
+
+        if (typeof senha !== 'string' || senha.length < 8) {
+            return res.status(400).json({
+                error: 'A senha deve ter pelo menos 8 caracteres.'
+            });
+        }
+
+        // Gerar hash da senha
+        const senhaHash = await bcrypt.hash(senha, 12);
+
+        const sql = `
+            INSERT INTO usuarios (nome, email, senha)
+            VALUES (?, ?, ?)
+        `;
+
+        conn.query(sql, [nome, email, senhaHash], (err, result) => {
+            if (err) {
+                console.error('Erro ao cadastrar usuario', err);
+                return res.status(500).json({
+                    mensagem: 'Erro interno ao cadastrar usuário.'
+                });
+            }
+
+            return res.status(201).json({
+                mensagem: 'Usuário cadastrado com sucesso!',
+                usuario: {
+                    id_usuario: result.insertId,
+                    nome,
+                    email
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error('Erro no cadastro:', error);
+
+        return res.status(500).json({
+            error: 'Erro interno no servidor.'
+        });
+    }
+});
+
+/* =========================================================
+   login
+   ========================================================= */
+
+app.post('/api/auth/login', (req, res) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({
+            error: 'Email e senha são obrigatórios.'
+        });
+    }
+
+    const emailUsuario = email.trim().toLowerCase();
+
+    const sql = `
+        SELECT id_usuario, nome, email, senha, ativo
+        FROM usuarios
+        WHERE email = ?
+        LIMIT 1
+    `;
+
+    conn.query(sql, [emailUsuario], async (err, data) => {
+        if (err) {
+            console.error('Erro ao consultar usuário:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao realizar login.'
+            });
+        }
+
+        if (data.length === 0) {
+            return res.status(401).json({
+                error: 'Email ou senha incorretos.'
+            });
+        }
+
+        const usuario = data[0];
+
+        if (!usuario.ativo) {
+            return res.status(403).json({
+                error: 'Esta conta está desativada.'
+            });
+        }
+
+        try {
+            const senhaValida = await bcrypt.compare(
+                senha,
+                usuario.senha
+            );
+
+            if (!senhaValida) {
+                return res.status(401).json({
+                    error: 'Email ou senha incorretos.'
+                });
+            }
+
+            // Regenerar a sessão após autenticação
+            req.session.regenerate((err) => {
+                if (err) {
+                    console.error('Erro ao criar sessão:', err);
+
+                    return res.status(500).json({
+                        error: 'Não foi possível iniciar a sessão.'
+                    });
+                }
+
+                req.session.user = {
+                    id_usuario: usuario.id_usuario,
+                    nome: usuario.nome,
+                    email: usuario.email
+                };
+
+                req.session.save((err) => {
+                    if (err) {
+                        console.error('Erro ao salvar sessão:', err);
+
+                        return res.status(500).json({
+                            error: 'Não foi possível salvar a sessão.'
+                        });
+                    }
+
+                    return res.status(200).json({
+                        message: 'Login realizado com sucesso!',
+                        usuario: req.session.user
+                    });
+                });
+            });
+
+        } catch (error) {
+            console.error('Erro ao validar senha:', error);
+
+            return res.status(500).json({
+                error: 'Erro interno ao validar senha.'
+            });
+        }
+    });
+});
+
+/* =========================================================
+   AUTENTICAÇÃO — VERIFICAR SESSÃO
+   ========================================================= */
+
+app.get('/api/auth/me', (req, res) => {
+    if (!req.session.user) {
+        return res.status(200).json({
+            authenticated: false,
+            usuario: null
+        });
+    }
+
+    return res.status(200).json({
+        authenticated: true,
+        usuario: req.session.user
+    });
+});
+
+/* =========================================================
+   AUTENTICAÇÃO — logout
+   ========================================================= */
+
+app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Erro ao encerrar sessão:', err);
+
+            return res.status(500).json({
+                error: 'Não foi possível encerrar a sessão.'
+            });
+        }
+
+        res.clearCookie('crud.sid', {
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: false
+        });
+
+        return res.status(200).json({
+            message: 'Logout realizado com sucesso!'
+        });
     });
 });
 
