@@ -121,3 +121,21 @@ export async function cadastrarGenero(nome){
 
     return data;
 }
+
+export async function cadastrarUsuario(usuario){
+    const response = await fetch(`${API_URL}/api/auth/cadastro`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(usuario)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao cadastrar usuário');
+    }
+
+    return data;
+}

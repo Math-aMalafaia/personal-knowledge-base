@@ -1,0 +1,169 @@
+
+.cadastro-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background:
+        radial-gradient(circle at top, #38271d 0%, transparent 55%),
+        var(--cor-fundo);
+}
+
+.cadastro-card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--cor-fundo-secundario);
+    border: 1px solid var(--cor-borda);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+.cadastro-header {
+    text-align: center;
+    padding: 30px 24px;
+    background: var(--cor-madeira-escura);
+    border-bottom: 2px solid var(--cor-dourado);
+}
+
+.cadastro-header h1 {
+    color: var(--cor-dourado-claro);
+    font-size: 27px;
+    margin-bottom: 10px;
+}
+
+.cadastro-header p {
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+.cadastro-conteudo {
+    padding: 30px;
+}
+
+.cadastro-conteudo h2 {
+    color: var(--cor-texto);
+    font-size: 23px;
+    margin-bottom: 8px;
+}
+
+.cadastro-descricao {
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.cadastro-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.cadastro-campo label {
+    color: var(--cor-texto);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.cadastro-campo input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 7px;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.cadastro-campo input::placeholder {
+    color: var(--cor-texto-secundario);
+    opacity: 0.7;
+}
+
+.cadastro-campo input:focus {
+    border-color: var(--cor-dourado);
+}
+
+.cadastro-botao {
+    width: 100%;
+    padding: 13px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 7px;
+    background: var(--cor-dourado);
+    color: #211a15;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.cadastro-botao:hover {
+    background: var(--cor-dourado-claro);
+}
+
+.cadastro-botao:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cadastro-mensagem {
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.cadastro-mensagem.erro {
+    background: rgba(166, 83, 83, 0.15);
+    border: 1px solid var(--cor-perigo);
+    color: #e9aaaa;
+}
+
+.cadastro-mensagem.sucesso {
+    background: rgba(102, 143, 104, 0.15);
+    border: 1px solid var(--cor-sucesso);
+    color: #a9d5aa;
+}
+
+.cadastro-mensagem button {
+    display: block;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--cor-sucesso);
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.cadastro-login {
+    margin-top: 22px;
+    text-align: center;
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+.cadastro-login a {
+    color: var(--cor-dourado-claro);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.cadastro-login a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .cadastro-conteudo {
+        padding: 24px 20px;
+    }
+
+    .cadastro-header h1 {
+        font-size: 23px;
+    }
+}
