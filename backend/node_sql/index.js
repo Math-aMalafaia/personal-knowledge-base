@@ -58,6 +58,16 @@ app.use(session({
     }
 }));
 
+function exigirAutenticacao(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({
+            error: 'Faça login para acessar sua estante.'
+        });
+    }
+
+    next();
+}
+
 conn.connect(function(err) {
     if (err) {
         console.log('Erro ao conectar ao MySQL:', err);
@@ -298,7 +308,8 @@ app.get('/', (req, res) => {
 
 /* Rota para exibir a lista de livros */
 
-app.get('/api/livros', (req, res) => {
+
+app.get('/api/livros', exigirAutenticacao, (req, res) => {
 
     const sql = `
         SELECT
@@ -313,10 +324,11 @@ app.get('/api/livros', (req, res) => {
         FROM livros l
         INNER JOIN autores a ON l.autor_id = a.id
         INNER JOIN generos g ON l.genero_id = g.id
+        WHERE l.id_usuario = ?
         ORDER BY l.id;
     `;
 
-    conn.query(sql, (err, data) => {
+    conn.query(sql, [req.session.user.id_usuario], (err, data) => {
 
         if (err) {
             console.log(err);
@@ -329,11 +341,13 @@ app.get('/api/livros', (req, res) => {
     });
 });
 
+
 /* =========================================================
    CADASTRAR LIVRO
    ========================================================= */
 
-app.post('/api/livros/inserir', (req, res) => {
+
+app.post('/api/livros/inserir', exigirAutenticacao, (req, res) => {
 
     const {
         nome,
@@ -358,13 +372,20 @@ app.post('/api/livros/inserir', (req, res) => {
 
     const sql = `
         INSERT INTO livros
-        (nome, autor_id, genero_id, status, quantidade)
-        VALUES (?, ?, ?, ?, ?)
+        (nome, autor_id, genero_id, status, quantidade, id_usuario)
+        VALUES (?, ?, ?, ?, ?, ?)
     `;
 
     conn.query(
         sql,
-        [nome, autor_id, genero_id, status, quantidade],
+        [
+            nome,
+            autor_id,
+            genero_id,
+            status,
+            quantidade,
+            req.session.user.id_usuario
+        ],
         (err, result) => {
 
             if (err) {
@@ -383,11 +404,13 @@ app.post('/api/livros/inserir', (req, res) => {
     );
 });
 
+
 /* =========================================================
    ATUALIZAR LIVRO
    ========================================================= */
 
-app.put('/api/livros/:id', (req, res) => {
+
+app.put('/api/livros/:id', exigirAutenticacao, (req, res) => {
 
     const id = req.params.id;
 
@@ -420,7 +443,7 @@ app.put('/api/livros/:id', (req, res) => {
             genero_id = ?,
             status = ?,
             quantidade = ?
-        WHERE id = ?
+        WHERE id = ? AND id_usuario = ?
     `;
 
     conn.query(
@@ -431,7 +454,8 @@ app.put('/api/livros/:id', (req, res) => {
             genero_id,
             status,
             quantidade,
-            id
+            id,
+            req.session.user.id_usuario
         ],
         (err, result) => {
 
@@ -464,43 +488,54 @@ app.put('/api/livros/:id', (req, res) => {
     );
 });
 
+
 /* =========================================================
    DELETAR LIVRO
    ========================================================= */
 
-app.delete('/api/livros/:id', (req, res) => {
+
+app.delete('/api/livros/:id', exigirAutenticacao, (req, res) => {
 
     const id = req.params.id;
 
-    const sql = 'DELETE FROM livros WHERE id = ?';
+    const sql = `
+        DELETE FROM livros
+        WHERE id = ? AND id_usuario = ?
+    `;
 
-    conn.query(sql, [id], (err, result) => {
+    conn.query(
+        sql,
+        [id, req.session.user.id_usuario],
+        (err, result) => {
 
-        if (err) {
-            console.log(err);
+            if (err) {
+                console.log(err);
 
-            return res.status(500).json({
-                error: 'Erro ao deletar livro'
+                return res.status(500).json({
+                    error: 'Erro ao deletar livro'
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    error: 'Livro não encontrado'
+                });
+            }
+
+            return res.status(200).json({
+                message: 'Livro deletado com sucesso'
             });
         }
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({
-                error: 'Livro não encontrado'
-            });
-        }
-
-        return res.status(200).json({
-            message: 'Livro deletado com sucesso'
-        });
-    });
+    );
 });
+
 
 /* =========================================================
    ESTATÍSTICAS
    ========================================================= */
 
-app.get('/api/livros/estatisticas', (req, res) => {
+
+app.get('/api/livros/estatisticas', exigirAutenticacao, (req, res) => {
 
     const sql = `
         SELECT
@@ -530,22 +565,28 @@ app.get('/api/livros/estatisticas', (req, res) => {
                 END
             ), 0) AS naoLidos
 
-        FROM livros;
+        FROM livros
+        WHERE id_usuario = ?;
     `;
 
-    conn.query(sql, (err, result) => {
+    conn.query(
+        sql,
+        [req.session.user.id_usuario],
+        (err, result) => {
 
-        if (err) {
-            console.log(err);
+            if (err) {
+                console.log(err);
 
-            return res.status(500).json({
-                error: 'Erro ao buscar estatísticas dos livros'
-            });
+                return res.status(500).json({
+                    error: 'Erro ao buscar estatísticas dos livros'
+                });
+            }
+
+            res.status(200).json(result[0]);
         }
-
-        res.status(200).json(result[0]);
-    });
+    );
 });
+
 
 /* =========================================================
    AUTORES
