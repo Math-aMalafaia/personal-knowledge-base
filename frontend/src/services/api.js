@@ -139,3 +139,53 @@ export async function cadastrarUsuario(usuario){
 
     return data;
 }
+
+
+export async function loginUsuario(credenciais) {
+    const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(credenciais)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao realizar login');
+    }
+
+    return data;
+}
+
+export async function buscarUsuarioLogado() {
+    const response = await fetch(`${API_URL}/api/auth/me`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Usuário não autenticado');
+    }
+
+    return data;
+}
+
+export async function logoutUsuario() {
+    const response = await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao encerrar sessão');
+    }
+
+    return data;
+}

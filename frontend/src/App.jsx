@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import LivroLista from './components/LivroLista'
 import Cadastro from './pages/Cadastro'
+import Login from './pages/Login'
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
 
         <Route
           path='/login'
-          element={<h1>Página de Login em construção</h1>}
+          element={<Login />}
         />
       </Routes>
     </div>
