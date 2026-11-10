@@ -2,16 +2,19 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginUsuario } from '../services/api'
+import { useAuth } from '../context/AuthContext';
 import './Login.css'
 
 function Login() {
-    const navigate = useNavigate()
+    const { verificarAutenticacao } = useAuth();
+    const navigate = useNavigate();
 
     const [email, setEmail] = useState('')
     const [senha, setSenha] = useState('')
 
     const [erro, setErro] = useState('')
     const [carregando, setCarregando] = useState(false)
+
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -26,7 +29,9 @@ function Login() {
                 senha
             })
 
-            // Login realizado: a sessão fica armazenada pelo navegador.
+            await verificarAutenticacao();
+
+           
             navigate('/', { replace: true })
 
         } catch (error) {

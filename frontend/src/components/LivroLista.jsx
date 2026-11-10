@@ -1,5 +1,7 @@
 import {useEffect, useState } from 'react';
 import { buscarLivros, buscarEstatisticas } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import LivroInserir from './LivroInserir';
 import LivroEditar from './LivroEditar';
 import LivroExcluir from './LivroExcluir';
@@ -17,6 +19,18 @@ function LivroLista() {
   const [mostrarEdicao, setMostrarEdicao] = useState(false);
   const [mostrarExclusao, setMostrarExclusao] = useState(false);
   const [livroSelecionado, setLivroSelecionado] = useState(null);
+
+  const { usuario, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const sair = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao sair:', error);
+    }
+  };
 
   const carregarLivros = () => {
     Promise.all([
@@ -75,8 +89,14 @@ function LivroLista() {
       <header className='biblioteca-cabecalho'>
         <div className='biblioteca-identidade'>
           <h1 className='biblioteca-titulo'>A Grande Biblioteca</h1>
-          <p className='biblioteca-subtitulo'>Bem-vindo à nossa biblioteca virtual!</p>
+          <p className='biblioteca-subtitulo'>
+            Bem-vindo, {usuario?.nome || 'usuário'}!
+          </p>
         </div>
+
+        <button className='botao botao-perigo'onClick={sair}>
+          Sair
+        </button>
       </header>
 
 
