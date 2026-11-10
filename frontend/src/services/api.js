@@ -1,7 +1,9 @@
 const API_URL = 'http://localhost:3000';
 
 export async function buscarLivros() {
-    const response = await fetch(`${API_URL}/api/livros`);
+    const response = await fetch(`${API_URL}/api/livros`, {
+        credential: 'include'
+    });
     if (!response.ok) {
         throw new Error('Erro ao buscar livros');
     }
@@ -14,6 +16,7 @@ export async function cadastrarLivro(livro) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credential: 'include',
         body: JSON.stringify(livro)
     });
 
@@ -31,6 +34,7 @@ export async function atualizarLivro(id, livro) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credential: 'include',
         body: JSON.stringify(livro)
     });
 
@@ -45,6 +49,7 @@ export async function atualizarLivro(id, livro) {
 export async function deletarLivro(id){
     const response = await fetch(`${API_URL}/api/livros/${id}`, {
         method: 'DELETE',
+        credential: 'include'
     });
 
     const data = await response.json();
@@ -56,7 +61,9 @@ export async function deletarLivro(id){
 }
 
 export async function buscarEstatisticas(){
-    const response = await fetch(`${API_URL}/api/livros/estatisticas`);
+    const response = await fetch(`${API_URL}/api/livros/estatisticas`, {
+        credential: 'include'
+    });
 
     if (!response.ok){
         throw new Error('Erro ao buscar estatisticas dos livros')
