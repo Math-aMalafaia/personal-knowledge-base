@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+
 import { buscarUsuarioLogado, logoutUsuario } from '../services/api';
 
 const AuthContext = createContext(null);
@@ -8,31 +10,63 @@ export function AuthProvider({ children }) {
     const [autenticado, setAutenticado] = useState(false);
     const [carregando, setCarregando] = useState(true);
 
+    const verificacaoAtual = useRef(0);
+
     async function verificarAutenticacao() {
+        const identificador = ++verificacaoAtual.current;
+
+        setCarregando(true);
+
         try {
             const dados = await buscarUsuarioLogado();
+
+
+            if (identificador !== verificacaoAtual.current) {
+                return false;
+            }
 
             if (dados.authenticated) {
                 setUsuario(dados.usuario);
                 setAutenticado(true);
-            } else {
+                return true;
+            }
+
+            setUsuario(null);
+            setAutenticado(false);
+
+            return false;
+
+        } catch (error) {
+            if (identificador === verificacaoAtual.current) {
+                console.error('Erro ao verificar autenticação:', error);
                 setUsuario(null);
                 setAutenticado(false);
             }
-        } catch (error) {
-            console.error('Erro ao verificar autenticação:', error);
-            setUsuario(null);
-            setAutenticado(false);
+
+            return false;
+
         } finally {
-            setCarregando(false);
+            if (identificador === verificacaoAtual.current) {
+                setCarregando(false);
+            }
         }
     }
 
     async function logout() {
-        await logoutUsuario();
 
-        setUsuario(null);
-        setAutenticado(false);
+        verificacaoAtual.current++;
+
+        setCarregando(true);
+
+        try {
+            await logoutUsuario();
+
+            setUsuario(null);
+            setAutenticado(false);
+
+        } finally {
+            setCarregando(false);
+        }
     }
 
     useEffect(() => {

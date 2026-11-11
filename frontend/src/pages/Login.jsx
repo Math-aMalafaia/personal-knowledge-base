@@ -29,8 +29,11 @@ function Login() {
                 senha
             })
 
-            await verificarAutenticacao();
+            const autenticado = await verificarAutenticacao();
 
+            if (!autenticado) {
+                throw new Error("Não foi ppossivelconfirmar su altenticaçã.");
+            }
            
             navigate('/', { replace: true })
 
