@@ -32,10 +32,10 @@ function Login() {
             const autenticado = await verificarAutenticacao();
 
             if (!autenticado) {
-                throw new Error("Não foi ppossivelconfirmar su altenticaçã.");
+                throw new Error("Não foi possivelconfirmar sua altenticação.");
             }
            
-            navigate('/', { replace: true })
+            navigate('/biblioteca', { replace: true })
 
         } catch (error) {
             setErro(error.message || 'E-mail ou senha incorretos.')

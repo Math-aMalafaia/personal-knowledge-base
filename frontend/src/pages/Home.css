@@ -1,0 +1,253 @@
+
+
+/* ================================
+   PÁGINA INICIAL
+   ================================ */
+
+.home {
+    min-height: 100vh;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+
+/* ================================
+   CABEÇALHO
+   ================================ */
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: var(--espaco-3) 8%;
+
+    background-color: var(--cor-fundo-secundario);
+    border-bottom: var(--borda-fina);
+    box-shadow: var(--sombra-leve);
+}
+
+.home-header h1 {
+    color: var(--cor-dourado);
+    font-size: 26px;
+    letter-spacing: 1px;
+}
+
+.home-header nav {
+    display: flex;
+    align-items: center;
+    gap: var(--espaco-3);
+}
+
+.home-header nav a {
+    color: var(--cor-texto);
+    font-weight: 600;
+    transition: var(--transicao);
+}
+
+.home-header nav a:hover {
+    color: var(--cor-dourado-claro);
+}
+
+.home-header .btn-cadastro {
+    padding: 10px 20px;
+
+    color: var(--cor-fundo);
+    background-color: var(--cor-dourado);
+
+    border-radius: var(--raio-medio);
+    transition: var(--transicao);
+}
+
+.home-header .btn-cadastro:hover {
+    background-color: var(--cor-dourado-claro);
+}
+
+
+/* ================================
+   SEÇÃO PRINCIPAL
+   ================================ */
+
+.home-hero {
+    min-height: 480px;
+
+    display: flex;
+    align-items: center;
+
+    padding: var(--espaco-5) 8%;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(23, 18, 15, 0.98),
+            rgba(23, 18, 15, 0.82)
+        ),
+        linear-gradient(
+            135deg,
+            var(--cor-madeira-escura),
+            var(--cor-fundo)
+        );
+
+    border-bottom: var(--borda-fina);
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.hero-content h2 {
+    margin-bottom: var(--espaco-3);
+
+    color: var(--cor-dourado-claro);
+
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.2;
+}
+
+.hero-content p {
+    margin-bottom: var(--espaco-4);
+
+    color: var(--cor-texto-secundario);
+
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.hero-button {
+    display: inline-block;
+
+    padding: 13px 26px;
+
+    color: var(--cor-fundo);
+    background-color: var(--cor-dourado);
+
+    border-radius: var(--raio-medio);
+
+    font-weight: bold;
+
+    transition: var(--transicao);
+}
+
+.hero-button:hover {
+    background-color: var(--cor-dourado-claro);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-media);
+}
+
+
+/* ================================
+   FUNCIONALIDADES
+   ================================ */
+
+.home-features {
+    padding: var(--espaco-5) 8%;
+    text-align: center;
+}
+
+.home-features h2 {
+    margin-bottom: var(--espaco-4);
+
+    color: var(--cor-dourado-claro);
+
+    font-size: 30px;
+}
+
+.features-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: var(--espaco-3);
+
+    margin-top: var(--espaco-4);
+}
+
+.features-container article {
+    padding: var(--espaco-4);
+
+    background-color: var(--cor-fundo-secundario);
+
+    border: var(--borda-fina);
+    border-radius: var(--raio-grande);
+
+    box-shadow: var(--sombra-leve);
+
+    transition: var(--transicao);
+}
+
+.features-container article:hover {
+    transform: translateY(-5px);
+    border-color: var(--cor-dourado);
+    box-shadow: var(--sombra-media);
+}
+
+.features-container h3 {
+    margin-bottom: var(--espaco-2);
+
+    color: var(--cor-dourado);
+    font-size: 20px;
+}
+
+.features-container p {
+    color: var(--cor-texto-secundario);
+    line-height: 1.7;
+}
+
+
+/* ================================
+   RODAPÉ
+   ================================ */
+
+.home-footer {
+    padding: var(--espaco-3);
+
+    text-align: center;
+
+    background-color: var(--cor-fundo-secundario);
+
+    border-top: var(--borda-fina);
+}
+
+.home-footer p {
+    color: var(--cor-texto-secundario);
+    font-size: 14px;
+}
+
+
+/* ================================
+   RESPONSIVIDADE
+   ================================ */
+
+@media (max-width: 700px) {
+
+    .home-header {
+        flex-direction: column;
+        gap: var(--espaco-2);
+
+        padding: var(--espaco-3);
+    }
+
+    .home-header nav {
+        gap: var(--espaco-2);
+    }
+
+    .home-hero {
+        min-height: 400px;
+        padding: var(--espaco-4) var(--espaco-3);
+    }
+
+    .hero-content h2 {
+        font-size: 32px;
+    }
+
+    .hero-content p {
+        font-size: 16px;
+    }
+
+    .home-features {
+        padding: var(--espaco-4) var(--espaco-3);
+    }
+
+    .features-container {
+        grid-template-columns: 1fr;
+    }
+}
