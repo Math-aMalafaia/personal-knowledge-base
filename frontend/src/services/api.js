@@ -196,3 +196,56 @@ export async function logoutUsuario() {
 
     return data;
 }
+
+export async function buscarPerfil() {
+    const response = await fetch(`${API_URL}/api/usuarios/me`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(dados.error || 'Erro ao consultar perfil.');
+    }
+
+    return dados;
+}
+
+export async function atualizarPerfil(usuario) {
+    const response = await fetch(`${API_URL}/api/usuarios/me`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(usuario)
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(dados.error || 'Erro ao atualizar perfil.');
+    }
+
+    return dados;
+}
+
+export async function alterarSenha(senhas) {
+    const response = await fetch(`${API_URL}/api/auth/senha`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(senhas)
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(dados.error || 'Erro ao alterar senha.');
+    }
+
+    return dados;
+}
