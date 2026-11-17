@@ -271,6 +271,190 @@ app.get('/api/auth/me', (req, res) => {
 });
 
 /* =========================================================
+   AUTENTICAÇÃO PERFIL — CONSULTAR DADOS
+   ========================================================= */
+
+app.get('/api/usuarios/me', exigirAutenticacao, (req, res) => {
+    const idUsuario = req.session.user.id_usuario;
+
+    const sql = `
+        SELECT id_usuario, nome, email, data_criacao
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sql, [idUsuario], (err, resultado) => {
+        if (err){
+            console.error('Erro ao consultar perfil: ', err);
+
+            return res.status(500).json({error: "Erro interno ao consultar perfil"});
+        }
+
+        if (resultado.length ===  0){
+            return res.status(404).json({usuario: null});
+        }
+
+        return res.status(200).json({usuario: resultado[0]});
+    });
+});
+
+
+/* =========================================================
+   AUTENTICAÇÃO PERFIL — ALTERAR SENHA
+   ========================================================= */
+
+app.put('/api/auth/senha', exigirAutenticacao, (req, res) => {
+    const idUsuario = req.session.user.id_usuario;
+
+    const { senhaAtual, novaSenha } = req.body;
+
+    if (typeof senhaAtual !== 'string' || typeof novaSenha !== 'string' || !senhaAtual || !novaSenha) {
+        return res.status(400).json({error: 'Informe a senha atual e a nova senha.'});
+    }
+
+    if (novaSenha.length < 8) {
+        return res.status(400).json({error: 'A nova senha deve possuir pelo menos 8 caracteres.'});
+    }
+
+    const sqlBuscarSenha = `
+        SELECT senha
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sqlBuscarSenha, [idUsuario], (err, resultado) => {
+        if (err) {
+            console.error('Erro ao buscar senha:', err);
+
+            return res.status(500).json({error: 'Erro interno ao verificar senha.'});
+        }
+
+        if (resultado.length === 0) {
+            return res.status(404).json({error: 'Usuário não encontrado.'});
+        }
+
+        const senhaHashAtual = resultado[0].senha;
+
+        bcrypt.compare(senhaAtual, senhaHashAtual, (err, senhaCorreta) => {
+            if (err) {
+                console.error('Erro ao comparar senha:', err);
+
+                return res.status(500).json({error: 'Erro ao verificar senha atual.'});
+            }
+
+            if (!senhaCorreta) {
+                return res.status(401).json({error: 'A senha atual está incorreta.'});
+            }
+
+            bcrypt.hash(novaSenha, 12, (err, novaSenhaHash) => {
+                if (err) {
+                    console.error('Erro ao criptografar nova senha:', err);
+
+                    return res.status(500).json({error: 'Erro ao processar nova senha.'});
+                }
+
+                // Atualizar a senha no banco de dados
+                const sqlAtualizarSenha = `
+                    UPDATE usuarios
+                    SET senha = ?
+                    WHERE id_usuario = ?
+                `;
+
+                conn.query( sqlAtualizarSenha, [novaSenhaHash, idUsuario], (err) => {
+                        if (err) {
+                            console.error('Erro ao atualizar senha:', err);
+
+                            return res.status(500).json({error: 'Erro ao atualizar senha.'});
+                        }
+
+                        return res.status(200).json({message: 'Senha alterada com sucesso.'});
+                });
+            });
+        });
+    });
+});
+
+
+/* =========================================================
+   AUTENTICAÇÃO PERFIL — Atualizar nome e email
+   ========================================================= */
+
+app.put('/api/usuarios/me', exigirAutenticacao, (req, res) => {
+    const idUsuario = req.session.user.id_usuario;
+
+    const { nome, email } = req.body;
+
+    if (typeof nome !== 'string' || typeof email !== 'string' || !nome.trim() || !email.trim()) {
+        return res.status(400).json({error: 'Nome e e-mail são obrigatórios.'});
+    }
+
+    const nomeUsuario = nome.trim();
+    const emailUsuario = email.trim().toLowerCase();
+
+    const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formatoEmail.test(emailUsuario)) {
+        return res.status(400).json({error: 'Informe um e-mail válido.'});
+    }
+
+    const sqlVerificarEmail = `
+        SELECT id_usuario
+        FROM usuarios
+        WHERE email = ?
+        AND id_usuario <> ?
+        LIMIT 1
+    `;
+
+    conn.query(sqlVerificarEmail, [emailUsuario, idUsuario], (err, resultado) => {
+        if (err) {
+            console.error('Erro ao verificar e-mail:', err);
+
+            return res.status(500).json({error: 'Erro ao verificar disponibilidade do e-mail.'});
+        }
+
+        if (resultado.length > 0) {
+            return res.status(409).json({error: 'Este e-mail já está sendo utilizado.'});
+        }
+
+        const sqlAtualizar = `
+            UPDATE usuarios
+            SET nome = ?, email = ?
+            WHERE id_usuario = ?
+        `;
+
+        conn.query(sqlAtualizar, [nomeUsuario, emailUsuario, idUsuario], (err) => {
+            if (err) {
+                console.error('Erro ao atualizar perfil:', err);
+
+                return res.status(500).json({error: 'Erro ao atualizar perfil.'});
+            }
+
+            req.session.user.nome = nomeUsuario;
+            req.session.user.email = emailUsuario;
+
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Erro ao salvar sessão:', err);
+
+                    return res.status(500).json({error: 'Perfil atualizado, mas houve um erro ao atualizar a sessão.'});
+                }
+
+                return res.status(200).json({
+                    message: 'Perfil atualizado com sucesso.',
+                    usuario: {
+                        id_usuario: idUsuario,
+                        nome: nomeUsuario,
+                        email: emailUsuario
+                        }
+                });
+            });
+        });
+    });
+});
+
+/* =========================================================
    AUTENTICAÇÃO — logout
    ========================================================= */
 
