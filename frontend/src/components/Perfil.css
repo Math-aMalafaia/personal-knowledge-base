@@ -1,0 +1,118 @@
+
+.perfil-container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.perfil-cabecalho {
+    margin-bottom: 30px;
+}
+
+.perfil-cabecalho h1 {
+    color: var(--cor-madeira-escura, #4b3025);
+    margin-bottom: 8px;
+}
+
+.perfil-cabecalho p,
+.perfil-descricao {
+    color: #777;
+}
+
+.perfil-card {
+    background: #fff;
+    border: 1px solid #e5ded5;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.perfil-card h2 {
+    color: var(--cor-madeira-escura, #4b3025);
+    margin-bottom: 8px;
+}
+
+.perfil-descricao {
+    margin-bottom: 22px;
+}
+
+.perfil-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.perfil-campo label {
+    font-weight: 600;
+    color: #49372d;
+}
+
+.perfil-campo input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 1px solid #d8cec3;
+    border-radius: 7px;
+    font-size: 15px;
+    outline: none;
+}
+
+.perfil-campo input:focus {
+    border-color: #a77b42;
+    box-shadow: 0 0 0 2px rgba(167, 123, 66, 0.15);
+}
+
+.perfil-card button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    background: var(--cor-madeira-escura, #4b3025);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.perfil-card button:hover {
+    opacity: 0.88;
+}
+
+.perfil-card button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.perfil-mensagem {
+    padding: 12px;
+    border-radius: 7px;
+    margin-bottom: 18px;
+}
+
+.perfil-mensagem.erro {
+    color: #842029;
+    background: #f8d7da;
+}
+
+.perfil-mensagem.sucesso {
+    color: #0f5132;
+    background: #d1e7dd;
+}
+
+.perfil-carregando {
+    text-align: center;
+    padding: 40px;
+}
+
+@media (max-width: 600px) {
+    .perfil-container {
+        margin: 20px auto;
+        padding: 14px;
+    }
+
+    .perfil-card {
+        padding: 20px;
+    }
+}
