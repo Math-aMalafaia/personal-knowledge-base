@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Cadastro from './pages/Cadastro'
 import Login from './pages/Login'
 import Home from './pages/Home'
+import Perfil from './components/Perfil'
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
           element={
             <ProtectedRoute>
               <LivroLista />
+            </ProtectedRoute>
+          }/>
+
+        <Route
+          path='/perfil'
+          element={
+            <ProtectedRoute>
+              <Perfil />
             </ProtectedRoute>
           }/>
 
