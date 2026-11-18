@@ -1,4 +1,4 @@
-
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { buscarPerfil, atualizarPerfil, alterarSenha } from '../services/api';
 
@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import './Perfil.css';
 
 function Perfil() {
+    const navigate = useNavigate();
     const { verificarAutenticacao } = useAuth();
 
     const [perfil, setPerfil] = useState({ nome: '', email: ''});
@@ -121,12 +122,25 @@ function Perfil() {
 
     return (
         <main className="perfil-container">
+            
             <header className="perfil-cabecalho">
-                <h1>Meu perfil</h1>
-                <p>Gerencie seus dados pessoais e a segurança da sua conta.</p>
+                <div>
+                    <h1>Meu perfil</h1>
+                    <p>
+                        Gerencie seus dados pessoais e a segurança da sua conta.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    className="perfil-voltar"
+                    onClick={() => navigate('/biblioteca')}
+                >
+                    Voltar para biblioteca
+                </button>
             </header>
 
-            {/* DADOS PESSOAIS */}
+
             <section className="perfil-card">
                 <h2>Dados pessoais</h2>
                 <p className="perfil-descricao">
