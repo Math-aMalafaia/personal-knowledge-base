@@ -32,6 +32,7 @@
 
     useEffect(() => {
         if (!livroSelecionado){
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setNome('');
             setAutorId('');
             setGeneroId('');
@@ -44,21 +45,21 @@
         setAutorId(String(livroSelecionado.autor_id));
         setGeneroId(String(livroSelecionado.genero_id));
         setStatus(livroSelecionado.status);
-        setQuantidade(livroSelecionado.qunatidade);
+        setQuantidade(livroSelecionado.quantidade);
     }, [livroSelecionado]);
 
-    const selecinarLivro = (id) => {
-        const livro = livro.find(
-            (livro) => livro.id === id
-        );
+    const selecionarLivro = (id) => {
+    const livroEncontrado = livros.find(
+        (livro) => String(livro.id) === String(id)
+    );
 
-        if (!livro){
-            setLivroSelecionado(null)
-            return;
-        }
+    if (!livroEncontrado) {
+        setLivroSelecionado(null);
+        return;
+    }
 
-        setLivroSelecionado(livro);
-    };
+    setLivroSelecionado(livroEncontrado);
+};
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -83,8 +84,8 @@
             atualizarLista();
             fechar();
         } catch (error) {
-            console.errer('Error ao editar livro:', error);
-            alert(error.messsage || 'Erro ao editar livro, tente novamente');
+            console.error('Erro ao editar livro:', error);
+            alert(error.message || 'Erro ao editar livro, tente novamente');
         }
     };
 
@@ -105,7 +106,7 @@
                         <label className='seletor-livros-titulo'>Escolhar um livro</label>
                         <div className='livros-selecao'>
                             {livros.map((livro) => (
-                                <button key={livro.id} type="button" className={`livro-selecao ${livroSelecionado?.id === livro.id ? 'livro-selecao-ativo' : ''}`} onClick={() => selecinarLivro(livro.id)}>
+                                <button key={livro.id} type="button" className={`livro-selecao ${livroSelecionado?.id === livro.id ? 'livro-selecao-ativo' : ''}`} onClick={() => selecionarLivro(livro.id)}>
                                     <span className='livro-selecao-titulo'>{livro.nome}</span>
                                 </button>
                             ))}
