@@ -24,6 +24,18 @@ const limitarTentativasLogin = rateLimit({
     }
 });
 
+const limitarTentativasCadastro = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+
+    message: {
+        error: 'Muitas tentativas de cadastro. Tente novamente em 15 minutos.'
+    }
+});
+
 const dbConfig = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -99,7 +111,7 @@ conn.connect(function(err) {
    cadastro
    ========================================================= */ 
 
-app.post('/api/auth/cadastro', async (req, res) => {
+app.post('/api/auth/cadastro', limitarTentativasCadastro, async (req, res) => {
     try {
         const { nome, email, senha } = req.body;
 
