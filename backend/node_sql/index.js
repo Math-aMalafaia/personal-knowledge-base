@@ -4,11 +4,14 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const session = require('express-session');
+const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
 
 const MySQLStore  = require('express-mysql-session')(session);
 
 const app = express();
+
+app.use(helmet());
 
 const limitarTentativasLogin = rateLimit({
     windowMs: 15 * 60 * 1000,
