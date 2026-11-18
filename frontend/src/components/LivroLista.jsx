@@ -94,9 +94,15 @@ function LivroLista() {
           </p>
         </div>
 
-        <button className='botao botao-perigo'onClick={sair}>
-          Sair
-        </button>
+        <div className="biblioteca-botoes">
+          <button className="botao botao-secundario" onClick={() => navigate('/perfil')}>
+            Meu perfil
+          </button>
+
+          <button className="botao botao-perigo" onClick={sair}>
+            Sair
+          </button>
+        </div>
       </header>
 
 
