@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const crypto = require('crypto');
 const session = require('express-session');
 const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
@@ -87,6 +88,41 @@ app.use(session({
     }
 }));
 
+function protegerCSRF(req, res, next) {
+
+    const metodosPermitidos = ['GET', 'HEAD', 'OPTIONS'];
+
+    if (metodosPermitidos.includes(req.method)) {
+        return next();
+    }
+
+    const tokenRecebido = req.get('X-CSRF-Token');
+    const tokenSessao = req.session?.csrfToken;
+
+    if (
+        typeof tokenRecebido !== 'string' ||
+        typeof tokenSessao !== 'string'
+    ) {
+        return res.status(403).json({ error: 'Token CSRF ausente ou inválido.'});
+    }
+
+    const recebido = Buffer.from(tokenRecebido);
+    const esperado = Buffer.from(tokenSessao);
+
+    if (
+        recebido.length !== esperado.length ||
+        !crypto.timingSafeEqual(recebido, esperado)
+    ) {
+        return res.status(403).json({ error: 'Token CSRF inválido.'});
+    }
+
+    next();
+}
+
+app.use(protegerCSRF);
+
+
+
 function exigirAutenticacao(req, res, next) {
     if (!req.session.user) {
         return res.status(401).json({
@@ -107,6 +143,28 @@ conn.connect(function(err) {
 
     app.listen(3000, () => {
         console.log('Servidor rodando em http://localhost:3000');
+    });
+});
+
+/* =========================================================
+   PROTEÇÃO CSRF — GERAR TOKEN
+   ========================================================= */
+
+app.get('/api/auth/csrf-token', (req, res) => {
+
+    if (!req.session.csrfToken) {
+        req.session.csrfToken = crypto.randomBytes(32).toString('hex');
+    }
+
+    req.session.save((err) => {
+
+        if (err) {
+            console.error('Erro ao salvar token CSRF:', err);
+
+            return res.status(500).json({ error: 'Não foi possível gerar o token de segurança.'});
+        }
+
+        return res.status(200).json({ csrfToken: req.session.csrfToken});
     });
 });
 
