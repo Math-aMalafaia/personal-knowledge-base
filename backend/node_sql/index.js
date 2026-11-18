@@ -1,14 +1,28 @@
 require('dotenv').config();
-
 const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const session = require('express-session');
+const { rateLimit } = require('express-rate-limit');
 
 const MySQLStore  = require('express-mysql-session')(session);
 
 const app = express();
+
+const limitarTentativasLogin = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+
+    skipSuccessfulRequests: true,
+
+    message: {
+        error: 'Muitas tentativas de login. Tente novamente em 15 minutos.'
+    }
+});
 
 const dbConfig = {
     host: process.env.DB_HOST,
@@ -157,7 +171,7 @@ app.post('/api/auth/cadastro', async (req, res) => {
    login
    ========================================================= */
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
     const { email, senha } = req.body;
 
     if (!email || !senha) {
