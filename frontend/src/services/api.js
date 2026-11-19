@@ -1,5 +1,43 @@
 const API_URL = 'http://localhost:3000';
 
+let csrfToken = null;
+
+async function obterTokenCSRF() {
+
+    if (csrfToken) {
+        return csrfToken;
+    }
+
+    const response = await fetch(`${API_URL}/api/auth/csrf-token`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || 'Erro ao obter token CSRF');
+    }
+
+    csrfToken = data.csrfToken;
+
+    return csrfToken;
+}
+
+async function requisicaoComCSRF(url, options = {}) {
+
+    const token = await obterTokenCSRF();
+
+    return fetch(url, {
+        ...options,
+        credentials: 'include',
+        headers: {
+            ...options.headers,
+            'X-CSRF-Token': token
+        }
+    });
+}
+
 export async function buscarLivros() {
     const response = await fetch(`${API_URL}/api/livros`, {
         credentials: 'include'
@@ -11,7 +49,7 @@ export async function buscarLivros() {
 }
 
 export async function cadastrarLivro(livro) {
-    const response = await fetch(`${API_URL}/api/livros/inserir`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/livros/inserir`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -29,7 +67,7 @@ export async function cadastrarLivro(livro) {
 }
 
 export async function atualizarLivro(id, livro) {
-    const response = await fetch(`${API_URL}/api/livros/${id}`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/livros/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -47,7 +85,7 @@ export async function atualizarLivro(id, livro) {
 }
 
 export async function deletarLivro(id){
-    const response = await fetch(`${API_URL}/api/livros/${id}`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/livros/${id}`, {
         method: 'DELETE',
         credentials: 'include'
     });
@@ -83,7 +121,7 @@ export async function buscarAutores() {
 
 export async function cadastrarAutor(nome){
     
-    const response = await fetch(`${API_URL}/api/autores`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/autores`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -112,7 +150,7 @@ export async function buscarGeneros(){
 
 export async function cadastrarGenero(nome){
 
-    const response = await fetch(`${API_URL}/api/generos`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/generos`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -130,7 +168,7 @@ export async function cadastrarGenero(nome){
 }
 
 export async function cadastrarUsuario(usuario){
-    const response = await fetch(`${API_URL}/api/auth/cadastro`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/auth/cadastro`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -149,7 +187,7 @@ export async function cadastrarUsuario(usuario){
 
 
 export async function loginUsuario(credenciais) {
-    const response = await fetch(`${API_URL}/api/auth/login`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -163,6 +201,8 @@ export async function loginUsuario(credenciais) {
     if (!response.ok) {
         throw new Error(data.error || 'Erro ao realizar login');
     }
+
+    csrfToken = null;
 
     return data;
 }
@@ -183,7 +223,7 @@ export async function buscarUsuarioLogado() {
 }
 
 export async function logoutUsuario() {
-    const response = await fetch(`${API_URL}/api/auth/logout`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include'
     });
@@ -193,6 +233,8 @@ export async function logoutUsuario() {
     if (!response.ok) {
         throw new Error(data.error || 'Erro ao encerrar sessão');
     }
+
+    csrfToken = null;
 
     return data;
 }
@@ -213,7 +255,7 @@ export async function buscarPerfil() {
 }
 
 export async function atualizarPerfil(usuario) {
-    const response = await fetch(`${API_URL}/api/usuarios/me`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/usuarios/me`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -232,7 +274,7 @@ export async function atualizarPerfil(usuario) {
 }
 
 export async function alterarSenha(senhas) {
-    const response = await fetch(`${API_URL}/api/auth/senha`, {
+    const response = await requisicaoComCSRF(`${API_URL}/api/auth/senha`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
