@@ -479,7 +479,20 @@ app.put('/api/auth/senha', exigirAutenticacao, (req, res) => {
                             return res.status(500).json({error: 'Erro ao atualizar senha.'});
                         }
 
-                        return res.status(200).json({message: 'Senha alterada com sucesso.'});
+                        registrarAuditoria(conn, {
+                            id_usuario: idUsuario,
+                            acao: 'ALTERAR_SENHA',
+                            descricao: 'Usuário alterou a senha',
+                            entidade: 'usuario',
+                            id_entidade: idUsuario,
+                            ip: req.ip
+                        }).then(() => {
+
+                            return res.status(200).json({
+                                message: 'Senha alterada com sucesso.'
+                            });
+
+                        });
                 });
             });
         });
@@ -551,13 +564,23 @@ app.put('/api/usuarios/me', exigirAutenticacao, (req, res) => {
                     return res.status(500).json({error: 'Perfil atualizado, mas houve um erro ao atualizar a sessão.'});
                 }
 
-                return res.status(200).json({
-                    message: 'Perfil atualizado com sucesso.',
-                    usuario: {
-                        id_usuario: idUsuario,
-                        nome: nomeUsuario,
-                        email: emailUsuario
-                        }
+                registrarAuditoria(conn, {
+                    id_usuario: idUsuario,
+                    acao: 'ALTERAR_PERFIL',
+                    descricao: 'Usuário atualizou os dados do perfil',
+                    entidade: 'usuario',
+                    id_entidade: idUsuario,
+                    ip: req.ip
+                }).then(() => {
+
+                    return res.status(200).json({
+                        message: 'Perfil atualizado com sucesso.',
+                        usuario: {
+                            id_usuario: idUsuario,
+                            nome: nomeUsuario,
+                            email: emailUsuario
+                            }
+                    });
                 });
             });
         });
@@ -1045,6 +1068,8 @@ app.get('/api/generos', (req, res) => {
         res.status(200).json(data);
     });
 });
+
+/* Cadastrar gêneros */
 
 app.post('/api/generos', (req, res) => {
     
