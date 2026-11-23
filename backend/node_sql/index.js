@@ -299,17 +299,37 @@ app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
         }
 
         if (data.length === 0) {
-            return res.status(401).json({
-                error: 'Email ou senha incorretos.'
+            registrarAuditoria(conn, {
+                id_usuario: null,
+                acao: 'LOGIN_FALHOU',
+                descricao: 'Tentativa de login com usuário inexistente',
+                entidade: 'usuario',
+                id_entidade: null,
+                ip: req.ip
+            }).then(() => {
+                return res.status(401).json({
+                    error: 'Email ou senha incorretos.'
+                });
             });
+            return;
         }
 
         const usuario = data[0];
 
         if (!usuario.ativo) {
-            return res.status(403).json({
-                error: 'Esta conta está desativada.'
+            registrarAuditoria(conn, {
+                id_usuario: usuario.id_usuario,
+                acao: 'LOGIN_BLOQUEADO',
+                descricao: 'Tentativa de login com conta desativada',
+                entidade: 'usuario',
+                id_entidade: usuario.id_usuario,
+                ip: req.ip
+            }).then(() => {
+                return res.status(403).json({
+                    error: 'Esta conta está desativada.'
+                });
             });
+            return;
         }
 
         try {
@@ -319,9 +339,19 @@ app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
             );
 
             if (!senhaValida) {
-                return res.status(401).json({
-                    error: 'Email ou senha incorretos.'
+                registrarAuditoria(conn, {
+                    id_usuario: usuario.id_usuario,
+                    acao: 'LOGIN_FALHOU',
+                    descricao: 'Tentativa de login com senha incorreta',
+                    entidade: 'usuario',
+                    id_entidade: usuario.id_usuario,
+                    ip: req.ip
+                }).then(() => {
+                    return res.status(401).json({
+                        error: 'Email ou senha incorretos.'
+                    });
                 });
+                return;
             }
 
             // Regenerar a sessão após autenticação
@@ -1150,7 +1180,7 @@ app.post('/api/generos', (req, res) => {
             }
             registrarAuditoria(conn, {
                 id_usuario: req.session.user.id_usuario,
-                acao: 'CRIA_GENERO',
+                acao: 'CRIAR_GENERO',
                 descricao: 'Novo genero cadastrado',
                 entidade: 'genero',
                 id_entidade: result.insertId,
