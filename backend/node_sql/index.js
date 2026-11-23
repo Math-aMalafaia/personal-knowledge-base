@@ -714,9 +714,21 @@ app.post('/api/livros/inserir', exigirAutenticacao, (req, res) => {
                 });
             }
 
-            return res.status(201).json({
-                message: 'Livro inserido com sucesso',
-                id: result.insertId
+            
+            registrarAuditoria(conn, {
+                id_usuario: req.session.user.id_usuario,
+                acao: 'CRIAR_LIVRO',
+                descricao: 'Livro cadastrado na biblioteca',
+                entidade: 'livro',
+                id_entidade: result.insertId,
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(201).json({
+                    message: 'Livro inserido com sucesso',
+                    id: result.insertId
+                });
+
             });
         }
     );
@@ -791,17 +803,29 @@ app.put('/api/livros/:id', exigirAutenticacao, (req, res) => {
                 });
             }
 
-            return res.status(200).json({
-                message: 'Livro atualizado com sucesso',
-                livro: {
-                    id,
-                    nome,
-                    autor_id,
-                    genero_id,
-                    status,
-                    quantidade
-                }
+            
+            registrarAuditoria(conn, {
+                id_usuario: req.session.user.id_usuario,
+                acao: 'EDITAR_LIVRO',
+                descricao: 'Livro atualizado na biblioteca',
+                entidade: 'livro',
+                id_entidade: Number(id),
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(200).json({
+                    message: 'Livro atualizado com sucesso',
+                    livro: {
+                        id,
+                        nome,
+                        autor_id,
+                        genero_id,
+                        status,
+                        quantidade
+                    }
+                });
             });
+
         }
     );
 });
@@ -837,8 +861,19 @@ app.delete('/api/livros/:id', exigirAutenticacao, (req, res) => {
                 });
             }
 
-            return res.status(200).json({
-                message: 'Livro deletado com sucesso'
+            registrarAuditoria(conn, {
+                id_usuario: req.session.user.id_usuario,
+                acao: 'EXCLUIR_LIVRO',
+                descricao: 'Livro excluído da biblioteca',
+                entidade: 'livro',
+                id_entidade: Number(id),
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(200).json({
+                    message: 'Livro deletado com sucesso'
+                });
+
             });
         }
     );
