@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const session = require('express-session');
 const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
+const registrarAuditoria = require('./services/auditoria');
 
 const MySQLStore  = require('express-mysql-session')(session);
 
@@ -221,13 +222,24 @@ app.post('/api/auth/cadastro', limitarTentativasCadastro, async (req, res) => {
                 });
             }
 
-            return res.status(201).json({
-                mensagem: 'Usuário cadastrado com sucesso!',
-                usuario: {
-                    id_usuario: result.insertId,
-                    nome,
-                    email
-                }
+            registrarAuditoria(conn, {
+                id_usuario: result.insertId,
+                acao: 'CADASTRO',
+                descricao: 'Novo usuário cadastrado',
+                entidade: 'usuario',
+                id_entidade: result.insertId,
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(201).json({
+                    mensagem: 'Usuário cadastrado com sucesso!',
+                    usuario: {
+                        id_usuario: result.insertId,
+                        nome,
+                        email
+                    }
+                });
+
             });
         });
 
@@ -322,9 +334,20 @@ app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
                         });
                     }
 
-                    return res.status(200).json({
-                        message: 'Login realizado com sucesso!',
-                        usuario: req.session.user
+                    registrarAuditoria(conn, {
+                        id_usuario: usuario.id_usuario,
+                        acao: 'LOGIN',
+                        descricao: 'Usuário realizou login',
+                        entidade: 'usuario',
+                        id_entidade: usuario.id_usuario,
+                        ip: req.ip
+                    }).then(() => {
+
+                        return res.status(200).json({
+                            message: 'Login realizado com sucesso!',
+                            usuario: req.session.user
+                        });
+
                     });
                 });
             });
@@ -545,8 +568,14 @@ app.put('/api/usuarios/me', exigirAutenticacao, (req, res) => {
    AUTENTICAÇÃO — logout
    ========================================================= */
 
+
 app.post('/api/auth/logout', (req, res) => {
+
+    // Guardar os dados antes de destruir a sessão
+    const usuario = req.session?.user;
+
     req.session.destroy((err) => {
+
         if (err) {
             console.error('Erro ao encerrar sessão:', err);
 
@@ -555,17 +584,35 @@ app.post('/api/auth/logout', (req, res) => {
             });
         }
 
-        res.clearCookie('crud.sid', {
-            httpOnly: true,
-            sameSite: 'lax',
-            secure: false
+        // Registrar logout somente se havia um usuário autenticado
+        const registroLogout = usuario
+            ? registrarAuditoria(conn, {
+                id_usuario: usuario.id_usuario,
+                acao: 'LOGOUT',
+                descricao: 'Usuário encerrou a sessão',
+                entidade: 'usuario',
+                id_entidade: usuario.id_usuario,
+                ip: req.ip
+            })
+            : Promise.resolve(true);
+
+        registroLogout.then(() => {
+
+            res.clearCookie('crud.sid', {
+                httpOnly: true,
+                sameSite: 'lax',
+                secure: false
+            });
+
+            return res.status(200).json({
+                message: 'Logout realizado com sucesso!'
+            });
+
         });
 
-        return res.status(200).json({
-            message: 'Logout realizado com sucesso!'
-        });
     });
 });
+
 
 /* Rota principal */
 
@@ -774,10 +821,7 @@ app.delete('/api/livros/:id', exigirAutenticacao, (req, res) => {
         WHERE id = ? AND id_usuario = ?
     `;
 
-    conn.query(
-        sql,
-        [id, req.session.user.id_usuario],
-        (err, result) => {
+    conn.query(sql, [id, req.session.user.id_usuario], (err, result) => {
 
             if (err) {
                 console.log(err);
