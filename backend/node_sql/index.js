@@ -125,10 +125,25 @@ app.use(protegerCSRF);
 
 
 function exigirAutenticacao(req, res, next) {
+
     if (!req.session.user) {
-        return res.status(401).json({
-            error: 'Faça login para acessar sua estante.'
+
+        registrarAuditoria(conn, {
+            id_usuario: null,
+            acao: 'ACESSO_NEGADO',
+            descricao: 'Tentativa de acesso sem autenticação',
+            entidade: 'rota',
+            id_entidade: null,
+            ip: req.ip
+        }).then(() => {
+
+            return res.status(401).json({
+                error: 'Faça login para acessar sua estante.'
+            });
+
         });
+
+        return;
     }
 
     next();
