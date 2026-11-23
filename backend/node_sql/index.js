@@ -991,7 +991,7 @@ app.get('/api/autores', (req, res) => {
 
 /* Cadastrar autores */
 
-app.post('/api/autores', (req, res) => {
+app.post('/api/autores', exigirAutenticacao, (req, res) => {
 
     const { nome } = req.body;
 
@@ -1037,7 +1037,24 @@ app.post('/api/autores', (req, res) => {
 
                 return res.status(500).json({error: 'Erro ao cadastra autor'})
             }
-            return res.status(201).json({message: 'Autor cadastrado com sucesso', autor: {id: result.insertId, nome: nomeAutor}});
+            registrarAuditoria(conn, {
+                id_usuario: req.session.user.id_usuario,
+                acao: 'CRIAR_AUTOR',
+                descricao: 'Novo autor cadastrado',
+                entidade: 'autor',
+                id_entidade: result.insertId,
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(201).json({
+                    message: 'Autor cadastrado com sucesso',
+                    autor: {
+                        id: result.insertId,
+                        nome: nomeAutor
+                    }
+                });
+
+            });
         });
     });
 });
@@ -1116,7 +1133,24 @@ app.post('/api/generos', (req, res) => {
 
                 return res.status(500).json({error: 'Erro ao cadastra autor'})
             }
-            return res.status(201).json({message: 'Autor cadastrado com sucesso', genero: {id: result.insertId, nome: nomeGenero}});
+            registrarAuditoria(conn, {
+                id_usuario: req.session.user.id_usuario,
+                acao: 'CRIA_GENERO',
+                descricao: 'Novo genero cadastrado',
+                entidade: 'genero',
+                id_entidade: result.insertId,
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(201).json({
+                    message: 'Genero cadastrado com sucesso',
+                    genero: {
+                        id: result.insertId,
+                        nome: nomeGenero
+                    }
+                });
+
+            });
         });
     });
 });
