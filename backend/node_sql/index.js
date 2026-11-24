@@ -233,8 +233,91 @@ app.get('/api/admin/teste', exigirAdmin, (req, res) => {
 
 });
 
+
 /* =========================================================
-   cadastro
+   ADMINISTRAÇÃO — LISTAR USUÁRIOS
+   ========================================================= */
+
+app.get('/api/admin/usuarios', exigirAdmin, (req, res) => {
+
+    const sql = `
+        SELECT
+            id_usuario,
+            nome,
+            email,
+            role,
+            ativo,
+            data_criacao
+        FROM usuarios
+        ORDER BY id_usuario DESC
+    `;
+
+    conn.query(sql, (err, resultado) => {
+
+        if (err) {
+            console.error('Erro ao listar usuários:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao listar usuários.'
+            });
+        }
+
+        return res.status(200).json(resultado);
+    });
+
+});
+
+/* =========================================================
+   ADMINISTRAÇÃO — CONSULTAR USUÁRIO POR ID
+   ========================================================= */
+
+app.get('/api/admin/usuarios/:id', exigirAdmin, (req, res) => {
+
+    const id = Number(req.params.id);
+
+    // Validar se o ID é um número inteiro positivo
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'ID de usuário inválido.'
+        });
+    }
+
+    const sql = `
+        SELECT
+            id_usuario,
+            nome,
+            email,
+            role,
+            ativo,
+            data_criacao
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sql, [id], (err, resultado) => {
+
+        if (err) {
+            console.error('Erro ao consultar usuário:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao consultar usuário.'
+            });
+        }
+
+        if (resultado.length === 0) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            });
+        }
+
+        return res.status(200).json(resultado[0]);
+    });
+
+});
+
+/* =========================================================
+   CADASTRO
    ========================================================= */ 
 
 app.post('/api/auth/cadastro', limitarTentativasCadastro, async (req, res) => {
@@ -270,7 +353,6 @@ app.post('/api/auth/cadastro', limitarTentativasCadastro, async (req, res) => {
             });
         }
 
-        // Gerar hash da senha
         const senhaHash = await bcrypt.hash(senha, 12);
 
         const sql = `
