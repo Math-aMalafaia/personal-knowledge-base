@@ -291,3 +291,33 @@ export async function alterarSenha(senhas) {
 
     return dados;
 }
+
+export async function buscarUsuariosAdmin() {
+    const response = await fetch(`${API_URL}/api/admin/usuarios`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(dados.error || 'Erro ao buscar usuários.');
+    }
+
+    return dados;
+}
+
+export async function buscarUsuarioAdmin(id) {
+    const response = await fetch(`${API_URL}/api/admin/usuarios/${id}`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(dados.error || 'Erro ao consultar usuário.');
+    }
+
+    return dados;
+}
