@@ -214,3 +214,86 @@
     }
 
 }
+
+
+/* LISTAGEM DE USUÁRIOS */
+
+.admin-usuarios {
+    margin-top: 35px;
+    padding: 24px;
+    background-color: var(--cor-fundo-secundario);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-medio);
+    box-shadow: var(--sombra-leve);
+}
+
+.admin-usuarios-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.admin-usuarios-cabecalho h2 {
+    margin-bottom: 6px;
+    font-size: 20px;
+}
+
+.admin-usuarios-cabecalho p {
+    color: var(--cor-texto-secundario);
+    font-size: 13px;
+}
+
+.admin-usuarios-cabecalho > span {
+    color: var(--cor-dourado);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.admin-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-tabela th,
+.admin-tabela td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--cor-borda);
+    font-size: 13px;
+}
+
+.admin-tabela th {
+    color: var(--cor-dourado);
+    font-weight: 600;
+}
+
+.admin-tabela td {
+    color: var(--cor-texto-secundario);
+}
+
+.admin-tabela tbody tr:hover {
+    background-color: var(--cor-madeira);
+}
+
+.admin-erro {
+    color: #ef7777;
+}
+
+@media (max-width: 650px) {
+    .admin-usuarios {
+        padding: 16px;
+    }
+
+    .admin-usuarios-cabecalho {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
