@@ -77,7 +77,9 @@ function Admin() {
 
     // Executar carregamento ao abrir o painel
     useEffect(() => {
-        carregarUsuarios();
+        Promise.resolve().then(() => {
+            carregarUsuarios();
+        });
     }, [carregarUsuarios]);
 
     return (

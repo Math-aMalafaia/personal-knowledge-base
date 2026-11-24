@@ -321,3 +321,23 @@ export async function buscarUsuarioAdmin(id) {
 
     return dados;
 }
+
+export async function buscarLogsUsuarioAdmin(id) {
+    const response = await fetch(
+        `${API_URL}/api/admin/usuarios/${id}/logs`,
+        {
+            method: 'GET',
+            credentials: 'include'
+        }
+    );
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            dados.error || 'Erro ao consultar atividades do usuário.'
+        );
+    }
+
+    return dados;
+}
