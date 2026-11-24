@@ -233,7 +233,6 @@ app.get('/api/admin/teste', exigirAdmin, (req, res) => {
 
 });
 
-
 /* =========================================================
    ADMINISTRAÇÃO — LISTAR USUÁRIOS
    ========================================================= */
@@ -312,6 +311,298 @@ app.get('/api/admin/usuarios/:id', exigirAdmin, (req, res) => {
         }
 
         return res.status(200).json(resultado[0]);
+    });
+
+});
+
+/* =========================================================
+   ADMINISTRAÇÃO — CONSULTAR LOGS DE UM USUÁRIO
+   ========================================================= */
+
+app.get('/api/admin/usuarios/:id/logs', exigirAdmin, (req, res) => {
+
+    const id = Number(req.params.id);
+
+    // Validar ID do usuário
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'ID de usuário inválido.'
+        });
+    }
+
+    // Verificar se o usuário existe
+    const sqlUsuario = `
+        SELECT id_usuario
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sqlUsuario, [id], (err, usuario) => {
+
+        if (err) {
+            console.error('Erro ao verificar usuário:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao verificar usuário.'
+            });
+        }
+
+        if (usuario.length === 0) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            });
+        }
+
+        // Buscar histórico de atividades
+        const sqlLogs = `
+            SELECT
+                id_log,
+                id_usuario,
+                acao,
+                descricao,
+                entidade,
+                id_entidade,
+                ip,
+                data_hora
+            FROM logs_auditoria
+            WHERE id_usuario = ?
+            ORDER BY data_hora DESC, id_log DESC
+        `;
+
+        conn.query(sqlLogs, [id], (err, logs) => {
+
+            if (err) {
+                console.error('Erro ao consultar logs:', err);
+
+                return res.status(500).json({
+                    error: 'Erro interno ao consultar atividades.'
+                });
+            }
+
+            return res.status(200).json({
+                usuario_id: id,
+                total: logs.length,
+                atividades: logs
+            });
+
+        });
+
+    });
+
+});
+
+/* =========================================================
+   ADMINISTRAÇÃO — BLOQUEAR USUÁRIO
+   ========================================================= */
+
+app.put('/api/admin/usuarios/:id/bloquear', exigirAdmin, (req, res) => {
+
+    const id = Number(req.params.id);
+    const idAdmin = req.session.user.id_usuario;
+
+    // Validar ID
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'ID de usuário inválido.'
+        });
+    }
+
+    // Impedir que o administrador bloqueie a própria conta
+    if (id === idAdmin) {
+        return res.status(403).json({
+            error: 'Você não pode bloquear sua própria conta.'
+        });
+    }
+
+    const sqlUsuario = `
+        SELECT id_usuario, nome, role, ativo
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sqlUsuario, [id], (err, resultado) => {
+
+        if (err) {
+            console.error('Erro ao consultar usuário:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao consultar usuário.'
+            });
+        }
+
+        if (resultado.length === 0) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            });
+        }
+
+        const usuario = resultado[0];
+
+        if (!usuario.ativo) {
+            return res.status(400).json({
+                error: 'Esta conta já está bloqueada.'
+            });
+        }
+
+        // Impedir bloqueio do último administrador ativo
+        if (usuario.role === 'admin') {
+
+            const sqlAdmins = `
+                SELECT COUNT(*) AS total
+                FROM usuarios
+                WHERE role = 'admin'
+                AND ativo = 1
+            `;
+
+            conn.query(sqlAdmins, (err, resultadoAdmins) => {
+
+                if (err) {
+                    console.error('Erro ao verificar administradores:', err);
+
+                    return res.status(500).json({
+                        error: 'Erro ao verificar administradores.'
+                    });
+                }
+
+                if (resultadoAdmins[0].total <= 1) {
+                    return res.status(403).json({
+                        error: 'Não é possível bloquear o último administrador ativo.'
+                    });
+                }
+
+                executarBloqueio();
+            });
+
+        } else {
+            executarBloqueio();
+        }
+
+        function executarBloqueio() {
+
+            const sqlBloquear = `
+                UPDATE usuarios
+                SET ativo = 0
+                WHERE id_usuario = ?
+            `;
+
+            conn.query(sqlBloquear, [id], (err) => {
+
+                if (err) {
+                    console.error('Erro ao bloquear usuário:', err);
+
+                    return res.status(500).json({
+                        error: 'Erro interno ao bloquear usuário.'
+                    });
+                }
+
+                registrarAuditoria(conn, {
+                    id_usuario: idAdmin,
+                    acao: 'BLOQUEAR_USUARIO',
+                    descricao: `Administrador bloqueou a conta de ${usuario.nome}`,
+                    entidade: 'usuario',
+                    id_entidade: id,
+                    ip: req.ip
+                }).then(() => {
+
+                    return res.status(200).json({
+                        message: 'Usuário bloqueado com sucesso.',
+                        id_usuario: id
+                    });
+
+                });
+
+            });
+
+        }
+
+    });
+
+});
+
+/* =========================================================
+   ADMINISTRAÇÃO — REATIVAR USUÁRIO
+   ========================================================= */
+
+app.put('/api/admin/usuarios/:id/reativar', exigirAdmin, (req, res) => {
+
+    const id = Number(req.params.id);
+    const idAdmin = req.session.user.id_usuario;
+
+    // Validar ID
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({
+            error: 'ID de usuário inválido.'
+        });
+    }
+
+    const sqlUsuario = `
+        SELECT id_usuario, nome, ativo
+        FROM usuarios
+        WHERE id_usuario = ?
+        LIMIT 1
+    `;
+
+    conn.query(sqlUsuario, [id], (err, resultado) => {
+
+        if (err) {
+            console.error('Erro ao consultar usuário:', err);
+
+            return res.status(500).json({
+                error: 'Erro interno ao consultar usuário.'
+            });
+        }
+
+        if (resultado.length === 0) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            });
+        }
+
+        const usuario = resultado[0];
+
+        // Verificar se a conta já está ativa
+        if (usuario.ativo) {
+            return res.status(400).json({
+                error: 'Esta conta já está ativa.'
+            });
+        }
+
+        const sqlReativar = `
+            UPDATE usuarios
+            SET ativo = 1
+            WHERE id_usuario = ?
+        `;
+
+        conn.query(sqlReativar, [id], (err) => {
+
+            if (err) {
+                console.error('Erro ao reativar usuário:', err);
+
+                return res.status(500).json({
+                    error: 'Erro interno ao reativar usuário.'
+                });
+            }
+
+            registrarAuditoria(conn, {
+                id_usuario: idAdmin,
+                acao: 'REATIVAR_USUARIO',
+                descricao: `Administrador reativou a conta de ${usuario.nome}`,
+                entidade: 'usuario',
+                id_entidade: id,
+                ip: req.ip
+            }).then(() => {
+
+                return res.status(200).json({
+                    message: 'Usuário reativado com sucesso.',
+                    id_usuario: id
+                });
+
+            });
+
+        });
+
     });
 
 });
