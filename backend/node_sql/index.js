@@ -149,6 +149,42 @@ function exigirAutenticacao(req, res, next) {
     next();
 }
 
+
+function exigirAdmin(req, res, next) {
+
+    // Primeiro verifica se existe uma sessão autenticada
+    if (!req.session.user) {
+        return res.status(401).json({
+            error: 'Autenticação necessária.'
+        });
+    }
+
+    // Verifica se o usuário possui permissão administrativa
+    if (req.session.user.role !== 'admin') {
+
+        registrarAuditoria(conn, {
+            id_usuario: req.session.user.id_usuario,
+            acao: 'ACESSO_NEGADO',
+            descricao: 'Tentativa de acesso a recurso administrativo sem permissão',
+            entidade: 'rota_admin',
+            id_entidade: null,
+            ip: req.ip
+        }).then(() => {
+
+            return res.status(403).json({
+                error: 'Você não tem permissão para acessar este recurso.'
+            });
+
+        });
+
+        return;
+    }
+
+    // Usuário autorizado
+    next();
+}
+
+
 conn.connect(function(err) {
     if (err) {
         console.log('Erro ao conectar ao MySQL:', err);
@@ -182,6 +218,19 @@ app.get('/api/auth/csrf-token', (req, res) => {
 
         return res.status(200).json({ csrfToken: req.session.csrfToken});
     });
+});
+
+/* =========================================================
+   AUTENTICAÇÃO — VERIFICAR SESSÃO ADMINISTRATIVA
+   ========================================================= */
+
+app.get('/api/admin/teste', exigirAdmin, (req, res) => {
+
+    return res.status(200).json({
+        message: 'Acesso administrativo autorizado!',
+        usuario: req.session.user
+    });
+
 });
 
 /* =========================================================
@@ -283,7 +332,7 @@ app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
     const emailUsuario = email.trim().toLowerCase();
 
     const sql = `
-        SELECT id_usuario, nome, email, senha, ativo
+        SELECT id_usuario, nome, email, senha, ativo, role
         FROM usuarios
         WHERE email = ?
         LIMIT 1
@@ -367,7 +416,8 @@ app.post('/api/auth/login', limitarTentativasLogin, (req, res) => {
                 req.session.user = {
                     id_usuario: usuario.id_usuario,
                     nome: usuario.nome,
-                    email: usuario.email
+                    email: usuario.email,
+                    role: usuario.role
                 };
 
                 req.session.save((err) => {
