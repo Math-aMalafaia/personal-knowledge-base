@@ -7,6 +7,7 @@ import Cadastro from './pages/Cadastro'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Perfil from './components/Perfil'
+import Admin from './pages/Admin'
 
 function App() {
   return (
@@ -16,6 +17,14 @@ function App() {
         <Route 
           path='/'
           element={<Home />}/>
+
+        <Route
+          path='/admin'
+          element={
+            <ProtectedRoute exigirAdmin={true}>
+              <Admin />
+            </ProtectedRoute>
+          }/>
 
         <Route
           path='/biblioteca'
