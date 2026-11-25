@@ -4,7 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import {
     buscarUsuariosAdmin,
     buscarUsuarioAdmin,
-    buscarLogsUsuarioAdmin
+    buscarLogsUsuarioAdmin,
+    bloquearUsuarioAdmin,
+    reativarUsuarioAdmin
 } from '../services/api';
 import './Admin.css';
 
@@ -43,6 +45,11 @@ function Admin() {
     const [filtroAcao, setFiltroAcao] = useState('');
     const [dataInicial, setDataInicial] = useState('');
     const [dataFinal, setDataFinal] = useState('');
+
+    // Estados das operações de bloqueio e reativação
+    const [processandoUsuario, setProcessandoUsuario] = useState(null);
+    const [mensagemOperacao, setMensagemOperacao] = useState('');
+    const [erroOperacao, setErroOperacao] = useState('');
 
     // Carregar usuários
     const carregarUsuarios = useCallback(async () => {
@@ -112,6 +119,82 @@ function Admin() {
             setCarregandoAtividades(false);
         }
     }
+
+
+    // Bloquear usuário
+    async function handleBloquearUsuario(id) {
+        const confirmar = window.confirm(
+            'Tem certeza de que deseja bloquear esta conta?'
+        );
+
+        if (!confirmar) return;
+
+        try {
+            setProcessandoUsuario(id);
+            setMensagemOperacao('');
+            setErroOperacao('');
+
+            await bloquearUsuarioAdmin(id);
+
+            setMensagemOperacao('Usuário bloqueado com sucesso!');
+
+            // Atualizar a listagem
+            await carregarUsuarios();
+
+            // Atualizar os detalhes, caso estejam abertos
+            if (
+                Number(usuarioSelecionado?.id_usuario) === Number(id)
+            ) {
+                const dadosAtualizados = await buscarUsuarioAdmin(id);
+                setUsuarioSelecionado(dadosAtualizados);
+            }
+
+        } catch (error) {
+            console.error('Erro ao bloquear usuário:', error);
+            setErroOperacao(error.message);
+
+        } finally {
+            setProcessandoUsuario(null);
+        }
+    }
+
+    // Reativar usuário
+    async function handleReativarUsuario(id) {
+        const confirmar = window.confirm(
+            'Tem certeza de que deseja reativar esta conta?'
+        );
+
+        if (!confirmar) return;
+
+        try {
+            setProcessandoUsuario(id);
+            setMensagemOperacao('');
+            setErroOperacao('');
+
+            await reativarUsuarioAdmin(id);
+
+            setMensagemOperacao('Usuário reativado com sucesso!');
+
+            // Atualizar a listagem
+            await carregarUsuarios();
+
+            // Atualizar os detalhes, caso estejam abertos
+            if (
+                Number(usuarioSelecionado?.id_usuario) === Number(id)
+            ) {
+                const dadosAtualizados = await buscarUsuarioAdmin(id);
+                setUsuarioSelecionado(dadosAtualizados);
+            }
+
+        } catch (error) {
+            console.error('Erro ao reativar usuário:', error);
+            setErroOperacao(error.message);
+
+        } finally {
+            setProcessandoUsuario(null);
+        }
+    }
+
 
     // Executar carregamento ao abrir o painel
     useEffect(() => {
@@ -248,6 +331,17 @@ function Admin() {
                     {/* LISTAGEM DE USUÁRIOS */}
                     <section className="admin-usuarios">
 
+                        {mensagemOperacao && (
+                            <p className="admin-sucesso">
+                                {mensagemOperacao}
+                            </p>
+                        )}
+
+                        {erroOperacao && (
+                            <p className="admin-erro">
+                                {erroOperacao}
+                            </p>
+                        )}
                         <div className="admin-usuarios-cabecalho">
                             <div>
                                 <h2>Usuários cadastrados</h2>
@@ -315,16 +409,48 @@ function Admin() {
                                                     {formatarData(item.data_criacao)}
                                                 </td>
 
-                                                <td>
-                                                    <button
-                                                        type="button"
-                                                        className="admin-btn-detalhes"
-                                                        onClick={() => consultarUsuario(item.id_usuario)}
-                                                        disabled={carregandoDetalhes}
-                                                    >
-                                                        Ver detalhes
-                                                    </button>
-                                                </td>
+                                                
+                                                    <td>
+                                                        <div className="admin-acoes">
+                                                            <button
+                                                                type="button"
+                                                                className="admin-btn-detalhes"
+                                                                onClick={() => consultarUsuario(item.id_usuario)}
+                                                                disabled={carregandoDetalhes || processandoUsuario !== null}
+                                                            >
+                                                                Ver detalhes
+                                                            </button>
+
+                                                            {Number(item.ativo) === 1 ? (
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-btn-bloquear"
+                                                                    onClick={() => handleBloquearUsuario(item.id_usuario)}
+                                                                    disabled={
+                                                                        processandoUsuario !== null ||
+                                                                        Number(usuario?.id_usuario) === Number(item.id_usuario)
+                                                                    }
+                                                                >
+                                                                    {processandoUsuario === item.id_usuario
+                                                                        ? 'Bloqueando...'
+                                                                        : 'Bloquear'}
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    type="button"
+                                                                    className="admin-btn-reativar"
+                                                                    onClick={() => handleReativarUsuario(item.id_usuario)}
+                                                                    disabled={processandoUsuario !== null}
+                                                                >
+                                                                    {processandoUsuario === item.id_usuario
+                                                                        ? 'Reativando...'
+                                                                        : 'Reativar'}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </td>
+
+                                                
                                             </tr>
                                         ))}
                                     </tbody>

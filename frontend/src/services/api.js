@@ -341,3 +341,41 @@ export async function buscarLogsUsuarioAdmin(id) {
 
     return dados;
 }
+
+export async function bloquearUsuarioAdmin(id) {
+    const response = await requisicaoComCSRF(
+        `${API_URL}/api/admin/usuarios/${id}/bloquear`,
+        {
+            method: 'PUT'
+        }
+    );
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            dados.error || 'Erro ao bloquear usuário.'
+        );
+    }
+
+    return dados;
+}
+
+export async function reativarUsuarioAdmin(id) {
+    const response = await requisicaoComCSRF(
+        `${API_URL}/api/admin/usuarios/${id}/reativar`,
+        {
+            method: 'PUT'
+        }
+    );
+
+    const dados = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            dados.error || 'Erro ao reativar usuário.'
+        );
+    }
+
+    return dados;
+}
