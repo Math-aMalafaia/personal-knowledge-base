@@ -1,16 +1,24 @@
-/*
+
+/* =========================================
    APLICAÇÃO
-*/
+========================================= */
 
 .app {
   min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.app *,
+.app *::before,
+.app *::after {
+  box-sizing: border-box;
 }
 
 
-/*
+/* =========================================
    CABEÇALHO DA BIBLIOTECA
-*/
+========================================= */
 
 .biblioteca-cabecalho {
   width: 100%;
@@ -26,20 +34,20 @@
   border-bottom: var(--borda-fina);
 
   background-color: var(--cor-fundo-secundario);
+
+  box-shadow: var(--sombra-leve);
 }
 
 
-
-/*
+/* =========================================
    IDENTIDADE
-*/
+========================================= */
 
 .biblioteca-identidade {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 }
-
 
 .biblioteca-titulo {
   color: var(--cor-texto);
@@ -48,19 +56,20 @@
   font-weight: 700;
 
   letter-spacing: 0.5px;
+  line-height: 1.2;
 }
-
 
 .biblioteca-subtitulo {
   color: var(--cor-texto-secundario);
 
   font-size: 15px;
+  line-height: 1.5;
 }
 
 
-/*
+/* =========================================
    ÁREA PRINCIPAL
-*/
+========================================= */
 
 .biblioteca-conteudo {
   width: 100%;
@@ -72,20 +81,19 @@
 }
 
 
-/*
+/* =========================================
    ÁREA DE AÇÕES
-*/
+========================================= */
 
 .biblioteca-acoes {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  gap: var(--espaco-2);
+  gap: var(--espaco-3);
 
   margin-bottom: var(--espaco-4);
 }
-
 
 .biblioteca-acoes-titulo {
   color: var(--cor-texto);
@@ -95,9 +103,9 @@
 }
 
 
-/*
+/* =========================================
    BOTÕES
-*/
+========================================= */
 
 .botao {
   display: inline-flex;
@@ -114,21 +122,34 @@
   font-size: 14px;
   font-weight: 600;
 
+  cursor: pointer;
+
   transition:
     background-color var(--transicao),
     border-color var(--transicao),
     transform var(--transicao),
-    box-shadow var(--transicao);
+    box-shadow var(--transicao),
+    filter var(--transicao);
 }
-
 
 .botao:hover {
   transform: translateY(-2px);
 }
 
-
 .botao:active {
   transform: translateY(0);
+}
+
+.botao:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 3px;
+}
+
+.botao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 
@@ -140,7 +161,6 @@
 
   box-shadow: var(--sombra-leve);
 }
-
 
 .botao-principal:hover {
   background-color: var(--cor-dourado-claro);
@@ -157,7 +177,6 @@
   border-color: var(--cor-borda);
 }
 
-
 .botao-secundario:hover {
   background-color: var(--cor-madeira-clara);
 }
@@ -170,31 +189,30 @@
   color: #fff;
 }
 
-
 .botao-perigo:hover {
   filter: brightness(1.1);
 }
 
-/*
+
+/* =========================================
    ESTATÍSTICAS
-*/
+========================================= */
 
 .estatisticas {
   display: grid;
 
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
   gap: var(--espaco-3);
 
   margin-bottom: var(--espaco-5);
 }
 
-
 .estatistica {
   display: flex;
   flex-direction: column;
 
-  gap: 6px;
+  gap: 10px;
 
   padding: var(--espaco-3);
 
@@ -204,8 +222,20 @@
   border-radius: var(--raio-medio);
 
   box-shadow: var(--sombra-leve);
+
+  transition:
+    transform var(--transicao),
+    border-color var(--transicao),
+    box-shadow var(--transicao);
 }
 
+.estatistica:hover {
+  transform: translateY(-3px);
+
+  border-color: var(--cor-dourado);
+
+  box-shadow: var(--sombra-media);
+}
 
 .estatistica-label {
   color: var(--cor-texto-secundario);
@@ -214,10 +244,8 @@
   font-weight: 600;
 
   text-transform: uppercase;
-
   letter-spacing: 0.5px;
 }
-
 
 .estatistica-valor {
   color: var(--cor-dourado);
@@ -225,12 +253,13 @@
   font-size: 32px;
   font-weight: 700;
 
-  line-height: 1;
+  line-height: 1.2;
 }
 
-/*
+
+/* =========================================
    ESTANTE
-*/
+========================================= */
 
 .estante {
   width: 100%;
@@ -246,9 +275,9 @@
 }
 
 
-/*
-   PRATELEIRA
-*/
+/* =========================================
+   PRATELEIRAS
+========================================= */
 
 .prateleira {
   position: relative;
@@ -269,12 +298,18 @@
   border-bottom: 14px solid var(--cor-madeira);
 
   background-color: var(--cor-madeira-escura);
+
+  box-shadow: 0 5px 8px rgba(0, 0, 0, 0.25);
+}
+
+.prateleira:last-child {
+  margin-bottom: 0;
 }
 
 
-/*
-   LIVRO
-*/
+/* =========================================
+   LIVROS
+========================================= */
 
 .livro {
   position: relative;
@@ -291,7 +326,7 @@
   padding: 12px 8px;
 
   border: none;
-  border-left: 5px solid rgba(0, 0, 0, 0.18);
+  border-left: 5px solid rgba(0, 0, 0, 0.2);
 
   border-radius: 2px 5px 4px 2px;
 
@@ -310,11 +345,6 @@
     filter var(--transicao);
 }
 
-
-/*
-   Efeito ao passar o mouse
-*/
-
 .livro:hover {
   transform: translateY(-14px);
 
@@ -326,10 +356,14 @@
   z-index: 2;
 }
 
+.livro:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 3px;
+  z-index: 3;
+}
 
-/*
-   Faixa do gênero
-*/
+
+/* Faixa do gênero */
 
 .livro-faixa {
   position: absolute;
@@ -342,7 +376,7 @@
 
   overflow: hidden;
 
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.85);
 
   font-size: 8px;
   font-weight: 600;
@@ -356,9 +390,7 @@
 }
 
 
-/*
-   Título do livro
-*/
+/* Título do livro */
 
 .livro-titulo {
   display: block;
@@ -368,7 +400,6 @@
   overflow: hidden;
 
   writing-mode: vertical-rl;
-
   text-orientation: mixed;
 
   color: var(--cor-texto);
@@ -382,9 +413,9 @@
 }
 
 
-/*
-   Estado vazio
-*/
+/* =========================================
+   ESTANTE VAZIA
+========================================= */
 
 .estante-vazia {
   min-height: 220px;
@@ -400,14 +431,17 @@
   text-align: center;
 }
 
-
 .estante-vazia p {
   max-width: 450px;
+
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-/* 
+
+/* =========================================
    MODAL
-    */
+========================================= */
 
 .modal-overlay {
   position: fixed;
@@ -422,13 +456,13 @@
 
   padding: var(--espaco-3);
 
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.75);
+
+  backdrop-filter: blur(3px);
 }
 
 
-/* 
-   CAIXA DO MODAL
-    */
+/* Caixa do modal */
 
 .modal {
   width: 100%;
@@ -445,12 +479,24 @@
   border-radius: var(--raio-grande);
 
   box-shadow: var(--sombra-forte);
+
+  animation: modalEntrada 0.2s ease-out;
+}
+
+@keyframes modalEntrada {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 
-/* 
-   CABEÇALHO DO MODAL
-    */
+/* Cabeçalho do modal */
 
 .modal-cabecalho {
   display: flex;
@@ -462,30 +508,30 @@
   margin-bottom: var(--espaco-4);
 }
 
-
 .modal-titulo {
   color: var(--cor-texto);
 
   font-size: 24px;
+  font-weight: 700;
 }
 
-
 .modal-subtitulo {
-  margin-top: 4px;
+  margin-top: 5px;
 
   color: var(--cor-texto-secundario);
 
   font-size: 14px;
+  line-height: 1.5;
 }
 
 
-/* 
-   BOTÃO FECHAR
-    */
+/* Botão fechar */
 
 .modal-fechar {
   width: 36px;
   height: 36px;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -508,33 +554,35 @@
     color var(--transicao);
 }
 
-
 .modal-fechar:hover {
   background-color: var(--cor-madeira);
 
   color: var(--cor-texto);
 }
 
+.modal-fechar:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 2px;
+}
 
-/* 
+
+/* =========================================
    FORMULÁRIO
-    */
+========================================= */
 
 .formulario-livro {
   display: flex;
   flex-direction: column;
 
-  gap: var(--espaco-2);
+  gap: var(--espaco-3);
 }
-
 
 .campo {
   display: flex;
   flex-direction: column;
 
-  gap: 6px;
+  gap: 7px;
 }
-
 
 .campo label {
   color: var(--cor-texto);
@@ -543,10 +591,10 @@
   font-weight: 600;
 }
 
-
 .campo input,
 .campo select {
   width: 100%;
+  min-height: 42px;
 
   padding: 11px 12px;
 
@@ -564,36 +612,34 @@
     box-shadow var(--transicao);
 }
 
-
 .campo input::placeholder {
   color: var(--cor-texto-secundario);
 }
-
 
 .campo input:focus,
 .campo select:focus {
   border-color: var(--cor-dourado);
 
-  box-shadow: 0 0 0 2px rgba(200, 155, 85, 0.15);
+  box-shadow: 0 0 0 3px rgba(200, 155, 85, 0.15);
 }
 
 
-/* 
-AÇÕES DO FORMULÁRIO
- */
+/* Ações do formulário */
 
 .formulario-acoes {
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
 
   gap: var(--espaco-2);
 
-  margin-top: var(--espaco-2);
+  margin-top: var(--espaco-3);
 }
 
-/* 
+
+/* =========================================
    SELEÇÃO DE LIVROS
- */
+========================================= */
 
 .seletor-livros {
   display: flex;
@@ -604,7 +650,6 @@ AÇÕES DO FORMULÁRIO
   margin-bottom: var(--espaco-3);
 }
 
-
 .seletor-livros-titulo {
   color: var(--cor-texto);
 
@@ -613,17 +658,17 @@ AÇÕES DO FORMULÁRIO
 }
 
 
-/* Área onde ficam os livros */
+/* Área de seleção */
 
 .livros-selecao {
   display: flex;
   align-items: flex-end;
 
-  gap: 8px;
+  gap: 10px;
 
   width: 100%;
 
-  padding: 16px 12px 12px;
+  padding: 20px 14px 12px;
 
   overflow-x: auto;
 
@@ -631,6 +676,8 @@ AÇÕES DO FORMULÁRIO
   border-radius: var(--raio-medio);
 
   background-color: var(--cor-madeira-escura);
+
+  scrollbar-width: thin;
 }
 
 
@@ -667,15 +714,19 @@ AÇÕES DO FORMULÁRIO
     box-shadow var(--transicao);
 }
 
-
 .livro-selecao:hover {
   transform: translateY(-8px);
 
   box-shadow: 3px 8px 10px rgba(0, 0, 0, 0.4);
 }
 
+.livro-selecao:focus-visible {
+  outline: 2px solid var(--cor-dourado);
+  outline-offset: 3px;
+}
 
-/* Nome escrito na lombada */
+
+/* Nome na lombada */
 
 .livro-selecao-titulo {
   display: block;
@@ -685,7 +736,6 @@ AÇÕES DO FORMULÁRIO
   overflow: hidden;
 
   writing-mode: vertical-rl;
-
   text-orientation: mixed;
 
   font-size: 12px;
@@ -707,7 +757,6 @@ AÇÕES DO FORMULÁRIO
     3px 10px 15px rgba(0, 0, 0, 0.45);
 }
 
-
 .livro-selecao-ativo::after {
   content: '';
 
@@ -724,9 +773,10 @@ AÇÕES DO FORMULÁRIO
   border-radius: 2px;
 }
 
-/* 
+
+/* =========================================
    CONFIRMAÇÃO DE EXCLUSÃO
-*/
+========================================= */
 
 .confirmacao-exclusao {
   display: flex;
@@ -772,9 +822,8 @@ AÇÕES DO FORMULÁRIO
   display: flex;
   flex-direction: column;
 
-  gap: 4px;
+  gap: 5px;
 }
-
 
 .confirmacao-conteudo h3 {
   color: var(--cor-perigo);
@@ -782,23 +831,41 @@ AÇÕES DO FORMULÁRIO
   font-size: 15px;
 }
 
-
 .confirmacao-conteudo p {
   color: var(--cor-texto-secundario);
 
   font-size: 13px;
 
-  line-height: 1.5;
+  line-height: 1.6;
 }
-
 
 .confirmacao-conteudo strong {
   color: var(--cor-texto);
 }
 
-/*
-   RESPONSIVIDADE
-*/
+
+/* =========================================
+   RESPONSIVIDADE - TABLETS
+========================================= */
+
+@media (max-width: 1024px) {
+
+  .estatisticas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .prateleira {
+    gap: 9px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+}
+
+
+/* =========================================
+   RESPONSIVIDADE - CELULARES
+========================================= */
 
 @media (max-width: 768px) {
 
@@ -809,27 +876,34 @@ AÇÕES DO FORMULÁRIO
     padding: var(--espaco-3);
   }
 
-
   .biblioteca-titulo {
     font-size: 26px;
   }
 
-
   .biblioteca-conteudo {
     padding: var(--espaco-3);
   }
-
 
   .biblioteca-acoes {
     align-items: flex-start;
     flex-direction: column;
   }
 
+  .estatisticas {
+    gap: var(--espaco-2);
+  }
+
+  .estatistica {
+    padding: var(--espaco-3);
+  }
+
+  .estatistica-valor {
+    font-size: 28px;
+  }
 
   .estante {
     padding: var(--espaco-2);
   }
-
 
   .prateleira {
     gap: 6px;
@@ -837,8 +911,17 @@ AÇÕES DO FORMULÁRIO
     padding-left: 10px;
     padding-right: 10px;
   }
+
+  .modal {
+    max-height: 92vh;
+  }
+
 }
 
+
+/* =========================================
+   RESPONSIVIDADE - CELULARES PEQUENOS
+========================================= */
 
 @media (max-width: 480px) {
 
@@ -846,20 +929,92 @@ AÇÕES DO FORMULÁRIO
     font-size: 23px;
   }
 
-
   .biblioteca-subtitulo {
     font-size: 14px;
   }
-
 
   .biblioteca-conteudo {
     padding: var(--espaco-2);
   }
 
+  .biblioteca-acoes-titulo {
+    font-size: 18px;
+  }
+
+  .estatisticas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .estatistica-label {
+    font-size: 11px;
+  }
+
+  .estatistica-valor {
+    font-size: 24px;
+  }
 
   .prateleira {
     min-height: 190px;
 
     gap: 4px;
+
+    padding-left: 6px;
+    padding-right: 6px;
   }
+
+  .livro {
+    flex-basis: 48px;
+
+    width: 48px;
+    height: 170px;
+  }
+
+  .livro-titulo {
+    font-size: 11px;
+  }
+
+  .formulario-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .formulario-acoes .botao {
+    width: 100%;
+  }
+
+  .modal {
+    padding: var(--espaco-3);
+  }
+
+  .modal-titulo {
+    font-size: 21px;
+  }
+
+}
+
+
+/* =========================================
+   PREFERÊNCIA DE MOVIMENTO REDUZIDO
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .livro,
+  .livro-selecao,
+  .botao,
+  .estatistica,
+  .modal-fechar {
+    transition: none;
+  }
+
+  .modal {
+    animation: none;
+  }
+
+  .livro:hover,
+  .livro-selecao:hover,
+  .botao:hover,
+  .estatistica:hover {
+    transform: none;
+  }
+
 }

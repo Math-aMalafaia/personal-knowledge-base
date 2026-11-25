@@ -1,74 +1,122 @@
 
-
-/* ================================
+/* =========================================
    PÁGINA INICIAL
-   ================================ */
+========================================= */
 
 .home {
     min-height: 100vh;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
     background-color: var(--cor-fundo);
     color: var(--cor-texto);
 }
 
 
-/* ================================
+/* =========================================
    CABEÇALHO
-   ================================ */
+========================================= */
 
 .home-header {
+    width: 100%;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    padding: var(--espaco-3) 8%;
+    gap: var(--espaco-4);
+
+    padding: var(--espaco-4) 8%;
 
     background-color: var(--cor-fundo-secundario);
-    border-bottom: var(--borda-fina);
+
+    border-bottom: 2px solid var(--cor-borda);
+
     box-shadow: var(--sombra-leve);
 }
 
 .home-header h1 {
-    color: var(--cor-dourado);
-    font-size: 26px;
-    letter-spacing: 1px;
+    color: var(--cor-dourado-claro);
+
+    font-size: 27px;
+    font-weight: 700;
+
+    letter-spacing: 0.8px;
 }
 
 .home-header nav {
     display: flex;
     align-items: center;
+
     gap: var(--espaco-3);
 }
 
 .home-header nav a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     color: var(--cor-texto);
+
+    font-size: 14px;
     font-weight: 600;
-    transition: var(--transicao);
+
+    text-decoration: none;
+
+    transition:
+        color var(--transicao),
+        background-color var(--transicao),
+        transform var(--transicao);
 }
 
 .home-header nav a:hover {
     color: var(--cor-dourado-claro);
 }
 
-.home-header .btn-cadastro {
-    padding: 10px 20px;
+.home-header nav a:focus-visible {
+    outline: 2px solid var(--cor-dourado);
+    outline-offset: 4px;
+    border-radius: var(--raio-medio);
+}
 
-    color: var(--cor-fundo);
+
+/* Botão de cadastro */
+
+.home-header .btn-cadastro {
+    padding: 11px 21px;
+
+    color: #211a15;
+
     background-color: var(--cor-dourado);
 
+    border: 1px solid transparent;
     border-radius: var(--raio-medio);
-    transition: var(--transicao);
+
+    box-shadow: var(--sombra-leve);
+
+    font-weight: 700;
 }
 
 .home-header .btn-cadastro:hover {
+    color: #211a15;
+
     background-color: var(--cor-dourado-claro);
+
+    transform: translateY(-2px);
+
+    box-shadow: var(--sombra-media);
 }
 
 
-/* ================================
+/* =========================================
    SEÇÃO PRINCIPAL
-   ================================ */
+========================================= */
 
 .home-hero {
+    position: relative;
+
     min-height: 480px;
 
     display: flex;
@@ -77,10 +125,15 @@
     padding: var(--espaco-5) 8%;
 
     background:
+        radial-gradient(
+            circle at 85% 40%,
+            rgba(200, 155, 85, 0.10),
+            transparent 35%
+        ),
         linear-gradient(
             90deg,
             rgba(23, 18, 15, 0.98),
-            rgba(23, 18, 15, 0.82)
+            rgba(23, 18, 15, 0.85)
         ),
         linear-gradient(
             135deg,
@@ -88,10 +141,11 @@
             var(--cor-fundo)
         );
 
-    border-bottom: var(--borda-fina);
+    border-bottom: 1px solid var(--cor-borda);
 }
 
 .hero-content {
+    width: 100%;
     max-width: 700px;
 }
 
@@ -101,10 +155,15 @@
     color: var(--cor-dourado-claro);
 
     font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+
     line-height: 1.2;
+    letter-spacing: 0.3px;
 }
 
 .hero-content p {
+    max-width: 650px;
+
     margin-bottom: var(--espaco-4);
 
     color: var(--cor-texto-secundario);
@@ -113,34 +172,63 @@
     line-height: 1.8;
 }
 
+
+/* Botão principal */
+
 .hero-button {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    padding: 13px 26px;
+    padding: 14px 27px;
 
-    color: var(--cor-fundo);
+    color: #211a15;
+
     background-color: var(--cor-dourado);
 
+    border: 1px solid transparent;
     border-radius: var(--raio-medio);
 
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: 700;
 
-    transition: var(--transicao);
+    text-decoration: none;
+
+    box-shadow: var(--sombra-leve);
+
+    transition:
+        background-color var(--transicao),
+        transform var(--transicao),
+        box-shadow var(--transicao);
 }
 
 .hero-button:hover {
     background-color: var(--cor-dourado-claro);
-    transform: translateY(-2px);
+
+    transform: translateY(-3px);
+
     box-shadow: var(--sombra-media);
 }
 
+.hero-button:active {
+    transform: translateY(0);
+}
 
-/* ================================
+.hero-button:focus-visible {
+    outline: 2px solid var(--cor-dourado);
+    outline-offset: 4px;
+}
+
+
+/* =========================================
    FUNCIONALIDADES
-   ================================ */
+========================================= */
 
 .home-features {
+    width: 100%;
+
     padding: var(--espaco-5) 8%;
+
     text-align: center;
 }
 
@@ -150,11 +238,13 @@
     color: var(--cor-dourado-claro);
 
     font-size: 30px;
+    font-weight: 700;
 }
 
 .features-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 
     gap: var(--espaco-3);
 
@@ -162,21 +252,31 @@
 }
 
 .features-container article {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
     padding: var(--espaco-4);
 
     background-color: var(--cor-fundo-secundario);
 
-    border: var(--borda-fina);
+    border: 1px solid var(--cor-borda);
     border-radius: var(--raio-grande);
 
     box-shadow: var(--sombra-leve);
 
-    transition: var(--transicao);
+    transition:
+        transform var(--transicao),
+        border-color var(--transicao),
+        box-shadow var(--transicao);
 }
 
 .features-container article:hover {
     transform: translateY(-5px);
+
     border-color: var(--cor-dourado);
+
     box-shadow: var(--sombra-media);
 }
 
@@ -184,54 +284,102 @@
     margin-bottom: var(--espaco-2);
 
     color: var(--cor-dourado);
+
     font-size: 20px;
+    font-weight: 700;
 }
 
 .features-container p {
     color: var(--cor-texto-secundario);
+
+    font-size: 14px;
     line-height: 1.7;
 }
 
 
-/* ================================
+/* =========================================
    RODAPÉ
-   ================================ */
+========================================= */
 
 .home-footer {
-    padding: var(--espaco-3);
+    width: 100%;
+
+    margin-top: auto;
+
+    padding: var(--espaco-4) var(--espaco-3);
 
     text-align: center;
 
     background-color: var(--cor-fundo-secundario);
 
-    border-top: var(--borda-fina);
+    border-top: 1px solid var(--cor-borda);
 }
 
 .home-footer p {
     color: var(--cor-texto-secundario);
+
     font-size: 14px;
+    line-height: 1.6;
 }
 
 
-/* ================================
-   RESPONSIVIDADE
-   ================================ */
+/* =========================================
+   RESPONSIVIDADE - TABLETS
+========================================= */
+
+@media (max-width: 900px) {
+
+    .home-header {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .home-hero {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .home-features {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .features-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================
+   RESPONSIVIDADE - CELULARES
+========================================= */
 
 @media (max-width: 700px) {
 
     .home-header {
         flex-direction: column;
-        gap: var(--espaco-2);
+
+        gap: var(--espaco-3);
 
         padding: var(--espaco-3);
     }
 
+    .home-header h1 {
+        font-size: 24px;
+        text-align: center;
+    }
+
     .home-header nav {
-        gap: var(--espaco-2);
+        justify-content: center;
+        flex-wrap: wrap;
+
+        gap: var(--espaco-3);
     }
 
     .home-hero {
         min-height: 400px;
+
         padding: var(--espaco-4) var(--espaco-3);
     }
 
@@ -241,13 +389,87 @@
 
     .hero-content p {
         font-size: 16px;
+        line-height: 1.7;
     }
 
     .home-features {
         padding: var(--espaco-4) var(--espaco-3);
     }
 
+    .home-features h2 {
+        font-size: 26px;
+    }
+
     .features-container {
         grid-template-columns: 1fr;
     }
+
+    .features-container article {
+        padding: var(--espaco-4) var(--espaco-3);
+    }
+
+}
+
+
+/* =========================================
+   RESPONSIVIDADE - CELULARES PEQUENOS
+========================================= */
+
+@media (max-width: 480px) {
+
+    .home-header h1 {
+        font-size: 21px;
+    }
+
+    .home-header nav {
+        gap: var(--espaco-2);
+    }
+
+    .home-header .btn-cadastro {
+        padding: 10px 16px;
+    }
+
+    .home-hero {
+        min-height: 360px;
+    }
+
+    .hero-content h2 {
+        font-size: 28px;
+    }
+
+    .hero-content p {
+        font-size: 15px;
+    }
+
+    .hero-button {
+        width: 100%;
+        padding: 13px 18px;
+    }
+
+    .home-features h2 {
+        font-size: 23px;
+    }
+
+}
+
+
+/* =========================================
+   MOVIMENTO REDUZIDO
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .home-header nav a,
+    .home-header .btn-cadastro,
+    .hero-button,
+    .features-container article {
+        transition: none;
+    }
+
+    .home-header .btn-cadastro:hover,
+    .hero-button:hover,
+    .features-container article:hover {
+        transform: none;
+    }
+
 }
