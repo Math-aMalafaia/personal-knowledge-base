@@ -259,16 +259,6 @@ function Admin() {
                             Visão geral
                         </Link>
 
-                        <div className="admin-menu-item">
-                            <span>♙</span>
-                            Usuários
-                        </div>
-
-                        <div className="admin-menu-item">
-                            <span>▤</span>
-                            Auditoria
-                        </div>
-
                         <Link to="/biblioteca" className="admin-menu-item">
                             <span>▣</span>
                             Biblioteca
@@ -297,9 +287,7 @@ function Admin() {
                                 Consulte e gerencie as contas
                                 cadastradas no sistema.
                             </p>
-                            <span className="admin-card-status">
-                                Em desenvolvimento
-                            </span>
+                            
                         </article>
 
                         <article className="admin-card">
@@ -309,9 +297,7 @@ function Admin() {
                                 Acompanhe as atividades e os
                                 registros de segurança.
                             </p>
-                            <span className="admin-card-status">
-                                Em desenvolvimento
-                            </span>
+                            
                         </article>
 
                         <article className="admin-card">
@@ -321,9 +307,7 @@ function Admin() {
                                 Controle o bloqueio e a reativação
                                 de contas.
                             </p>
-                            <span className="admin-card-status">
-                                Em desenvolvimento
-                            </span>
+                            
                         </article>
 
                     </section>
